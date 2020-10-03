@@ -16,3 +16,6 @@
 
 #### add help
     when h is pressed show help
+
+#### add color to select and unselect mode
+    when select or unselect mode is active, change the cursor color
