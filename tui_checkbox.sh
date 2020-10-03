@@ -17,7 +17,8 @@
 SELECTED="[x]"
 UNSELECTED="[ ]"
 
-options=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6")
+# options=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9" "Option 10" "Option 11" "Option 13" "Option 14" "Option 15" "Option 16" "Option 17" "Option 18" "Option 19")
+options=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9")
 cursor=0
 multiple_options=false
 return_index=false
@@ -56,12 +57,22 @@ draw_line() {
   fi
 }
 
+set_line_color() {
+  if $multiple_options && $select_mode; then
+    tput setaf 2
+  elif $multiple_options && $unselect_mode; then
+    tput setaf 1
+  else
+    tput setaf 4
+  fi
+}
+
 draw() {
   for index in "${!options[@]}"; do
     option=${options[$index]}
 
     if [[ ${options[$cursor]} == $option ]]; then
-      tput setaf 2
+      set_line_color
       draw_line $index "$option"
       tput sgr0
     else
@@ -131,7 +142,7 @@ select_option() {
   fi
 }
 
-selected_option_mode() {
+select_option_loop() {
   if ! array_contains_value "$cursor" "${selected_options[@]}" && $multiple_options && $select_mode; then
     selected_options+=("$cursor")
   elif array_contains_value "$cursor" "${selected_options[@]}" && $multiple_options && $unselect_mode; then
@@ -180,24 +191,28 @@ handle_parameters() {
 }
 
 toggle_select_mode() {
-  unselect_mode=false
+  if $multiple_options; then
+    unselect_mode=false
 
-  if $select_mode; then
-    select_mode=false
-  else
-    select_mode=true
-    selected_options+=("$cursor")
+    if $select_mode; then
+      select_mode=false
+    else
+      select_mode=true
+      selected_options+=("$cursor")
+    fi
   fi
 }
 
 toggle_unselect_mode() {
-  select_mode=false
+  if $multiple_options; then
+    select_mode=false
 
-  if $unselect_mode; then
-    unselect_mode=false
-  else
-    unselect_mode=true
-    selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
+    if $unselect_mode; then
+      unselect_mode=false
+    else
+      unselect_mode=true
+      selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
+    fi
   fi
 }
 
@@ -209,8 +224,8 @@ main() {
     key=$(handle_key_press)
 
     case "$key" in
-      _up|k) ((cursor > 0)) && ((cursor--));selected_option_mode;;
-      _down|j) ((cursor < ${#options[@]}-1)) && ((cursor++));selected_option_mode;;
+      _up|k) ((cursor > 0)) && ((cursor--));select_option_loop;;
+      _down|j) ((cursor < ${#options[@]}-1)) && ((cursor++));select_option_loop;;
       _pgup|u) page_up;;
       _pgdown|d) page_down;;
       _enter|c) confirm; return;;
