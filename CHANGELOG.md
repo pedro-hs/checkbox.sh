@@ -8,3 +8,4 @@
 - add selection and unselection mode
 - add TODO.md
 - add CHANGELOG.md
+- add colors to selection and unselection mode

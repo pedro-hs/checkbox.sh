@@ -17,6 +17,7 @@
 SELECTED="[x]"
 UNSELECTED="[ ]"
 
+# options=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9" "Option 10" "Option 11" "Option 13" "Option 14" "Option 15" "Option 16" "Option 17" "Option 18" "Option 19")
 options=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9")
 cursor=0
 multiple_options=false
@@ -56,19 +57,22 @@ draw_line() {
   fi
 }
 
+set_line_color() {
+  if $multiple_options && $select_mode; then
+    tput setaf 2
+  elif $multiple_options && $unselect_mode; then
+    tput setaf 1
+  else
+    tput setaf 4
+  fi
+}
+
 draw() {
   for index in "${!options[@]}"; do
     option=${options[$index]}
 
     if [[ ${options[$cursor]} == $option ]]; then
-      if $multiple_options && $select_mode; then
-        tput setaf 2
-      elif $multiple_options && $unselect_mode; then
-        tput setaf 1
-      else
-        tput setaf 4
-      fi
-
+      set_line_color
       draw_line $index "$option"
       tput sgr0
     else

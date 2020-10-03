@@ -16,3 +16,6 @@
 
 #### add help
 - when h is pressed show help
+
+#### json support
+- create nested checkboxes passing a json data or json file with title and options
