@@ -1,5 +1,6 @@
-#### fix terminal blinking
-- terminal blink when have more options than lines on terminal
+#### fix first option is missing when pgup until end of options
+
+#### add select and unselect mode for home/end/pgup/pgdown
 
 #### add example of usage
 - show mocked options when passed -e to the script
