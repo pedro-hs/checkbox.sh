@@ -279,7 +279,6 @@ main() {
         erase
         draw
     done
-
 }
 
 main $1 $2
