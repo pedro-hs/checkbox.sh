@@ -28,12 +28,13 @@ GREEN="\e[2K\e[32m"
 options=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9" "Option 10" "Option 11" "Option 12" "Option 13" "Option 14" "Option 15" "Option 16" "Option 17" "Option 18" "Option 19" "Option 20" "Option 21" "Option 22" "Option 23" "Option 24" "Option 25" "Option 26" "Option 27" "Option 28" "Option 29" "Option 30")
 
 cursor=0
-page_start_index=0
+start_page_index=0
+options_length=${#options[@]}
 
-multiple_options=false
-return_index=false
-select_mode=false
-unselect_mode=false
+has_multiple_options=false
+will_return_index=false
+unselect_mode_on=false
+select_mode_on=false
 
 output=()
 selected_options=()
@@ -45,10 +46,10 @@ color=$WHITE
 # UTILS
 #===============================================================================
 array_contains_value() {
-    local e match="$1"
+    value=$1
     shift
-    for e; do [[ "$e" == "$match" ]] && return 0; done
-    return 1
+    array=("$@")
+    [[ ${array[@]} =~ $value ]] && return 0 || return 1
 }
 
 array_without_value() {
@@ -68,26 +69,13 @@ array_without_value() {
 # RENDERIZATION
 #===============================================================================
 index_in_page() {
-    lines_amount=$(tput lines)
-    options_length=${#options[@]}
-    if [[ $lines_amount > options_length ]]; then
-        lines_amount=$options_length
-    fi
-    columns_amount=$(tput cols)
+    index=$1
 
-    page_end_index=$((page_start_index + lines_amount - 2))
-    ((page_end_index > options_length)) && ((page_end_index=$((options_length - lines_amount))))
+    terminal_width=$(get_terminal_width)
+    end_page_index=$(get_end_page_index $terminal_width)
+    handle_start_page_index $end_page_index $terminal_width
 
-    if [[ $cursor -gt $page_end_index ]]; then
-        page_start_index=$((page_end_index + 1))
-        ((page_start_index > $options_length)) && ((page_start_index=$((options_length - lines_amount))))
-
-    elif [[ $cursor -lt $page_end_index && ! $cursor -gt $page_start_index ]]; then
-        page_start_index=$((page_start_index - 1))
-        ((page_start_index < 0)) && ((page_start_index=0))
-    fi
-
-    return $([[ $index -ge $page_start_index ]] && [[ $index -le $page_end_index ]])
+    return $([[ $index -ge $start_page_index ]] && [[ $index -le $end_page_index ]])
 }
 
 draw_line() {
@@ -103,10 +91,10 @@ draw_line() {
 }
 
 set_line_color() {
-    if $multiple_options && $select_mode; then
+    if $has_multiple_options && $select_mode_on; then
         color=$GREEN
 
-    elif $multiple_options && $unselect_mode; then
+    elif $has_multiple_options && $unselect_mode_on; then
         color=$RED
 
     else
@@ -146,35 +134,35 @@ render() {
 # KEY ACTIONS
 #===============================================================================
 toggle_select_mode() {
-    if $multiple_options; then
-        unselect_mode=false
+    if $has_multiple_options; then
+        unselect_mode_on=false
 
-        if $select_mode; then
-            select_mode=false
+        if $select_mode_on; then
+            select_mode_on=false
 
         else
-            select_mode=true
+            select_mode_on=true
             selected_options+=("$cursor")
         fi
     fi
 }
 
 toggle_unselect_mode() {
-    if $multiple_options; then
-        select_mode=false
+    if $has_multiple_options; then
+        select_mode_on=false
 
-        if $unselect_mode; then
-            unselect_mode=false
+        if $unselect_mode_on; then
+            unselect_mode_on=false
 
         else
-            unselect_mode=true
+            unselect_mode_on=true
             selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
         fi
     fi
 }
 
 select_all() {
-    if $multiple_options; then
+    if $has_multiple_options; then
         for index in ${!options[@]}; do
             selected_options+=("${index}")
         done
@@ -182,7 +170,7 @@ select_all() {
 }
 
 unselect_all() {
-    if $multiple_options; then
+    if $has_multiple_options; then
         for index in ${!options[@]}; do
             selected_options=($(array_without_value "$index" "${selected_options[@]}"))
         done
@@ -207,7 +195,7 @@ page_down() {
 
 select_option() {
     if ! array_contains_value "$cursor" "${selected_options[@]}"; then
-        if $multiple_options; then
+        if $has_multiple_options; then
             selected_options+=("$cursor")
 
         else
@@ -220,16 +208,16 @@ select_option() {
 }
 
 select_option_loop() {
-    if ! array_contains_value "$cursor" "${selected_options[@]}" && $multiple_options && $select_mode; then
+    if ! array_contains_value "$cursor" "${selected_options[@]}" && $has_multiple_options && $select_mode_on; then
         selected_options+=("$cursor")
 
-    elif array_contains_value "$cursor" "${selected_options[@]}" && $multiple_options && $unselect_mode; then
+    elif array_contains_value "$cursor" "${selected_options[@]}" && $has_multiple_options && $unselect_mode_on; then
         selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
     fi
 }
 
 confirm() {
-    if $return_index; then
+    if $will_return_index; then
         output=${selected_options[@]}
 
     else
@@ -252,8 +240,8 @@ handle_parameters() {
         shift
 
         case "${opt}" in
-            -i) return_index=true;;
-            -m) multiple_options=true;;
+            -i) will_return_index=true;;
+            -m) has_multiple_options=true;;
         esac
     done
 }
@@ -261,28 +249,62 @@ handle_parameters() {
 handle_key_press() {
     IFS= read -sN1 key 2>/dev/null >&2
 
-    read -sN1 -t 0.0001 k1;
-    read -sN1 -t 0.0001 k2;
-    read -sN1 -t 0.0001 k3;
+    read -sN1 -t 0.0001 k1
+    read -sN1 -t 0.0001 k2
+    read -sN1 -t 0.0001 k3
     key+=${k1}${k2}${k3}
 
     case "${key}" in
-        '') key=_enter;;
-        ' ') key=_space;;
         $'\x1b') key=_esc;;
-        $'\x1b\x5b\x36\x7e') key=_pgdown;;
-        $'\x1b\x5b\x35\x7e') key=_pgup;;
-        $'\x7f') key=_backspace;;
-        $'\x1b\x5b\x32\x7e') key=_insert;;
-        $'\e[A'|$'\e0A  '|$'\e[D'|$'\e0D') key=_up;;
-        $'\e[B'|$'\e0B'|$'\e[C'|$'\e0C') key=_down;;
-        $'\e[1~'|$'\e0H'|$'\e[H') key=_home;;
-        $'\e[4~'|$'\e0F'|$'\e[F') key=_end;;
+        ' ') key=_space;;
+        '') key=_enter;;
         $'\e') key=_enter;;
         $'\x0a') key=_enter;;
+        $'\x7f') key=_backspace;;
+        $'\x1b\x5b\x32\x7e') key=_insert;;
+        $'\x1b\x5b\x35\x7e') key=_pgup;;
+        $'\x1b\x5b\x36\x7e') key=_pgdown;;
+        $'\e[1~'|$'\e0H'|$'\e[H') key=_home;;
+        $'\e[4~'|$'\e0F'|$'\e[F') key=_end;;
+        $'\e[A'|$'\e0A  '|$'\e[D'|$'\e0D') key=_up;;
+        $'\e[B'|$'\e0B'|$'\e[C'|$'\e0C') key=_down;;
     esac
 
     echo $key
+}
+
+get_terminal_width() {
+    terminal_width=$(tput lines)
+
+    if [[ $terminal_width > $options_length ]]; then
+        terminal_width=$options_length
+    fi
+
+    echo $terminal_width
+}
+
+get_end_page_index() {
+    terminal_width=$1
+
+    end_page_index=$((start_page_index + terminal_width - 2))
+    ((end_page_index > options_length)) && ((end_page_index=$((options_length - terminal_width))))
+
+    echo $end_page_index
+}
+
+handle_start_page_index() {
+    end_page_index=$1
+    terminal_width=$2
+
+    if [[ $cursor -gt $end_page_index ]]; then
+        start_page_index=$((end_page_index + 1))
+        ((start_page_index > $options_length)) && ((start_page_index=$((options_length - terminal_width))))
+
+    elif [[ $cursor -lt $end_page_index && ! $cursor -gt $start_page_index ]]; then
+        start_page_index=$((start_page_index - 1))
+        ((start_page_index < 0)) && ((start_page_index=0))
+    fi
+
 }
 
 #===============================================================================
