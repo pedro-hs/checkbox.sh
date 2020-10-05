@@ -1,13 +1,25 @@
 #!/usr/bin/env bash
 #===============================================================================
 #NAME
-#  tui_checkbox.sh
+#  terminal_checkbox.sh
 #
 #DESCRIPTION
-#  Create checkboxes with single and multiple selection
+#  Create checkboxes (menu) on terminal
+#  For more info look the README.md on <https://github.com/pedro-hs/terminal-checkbox>
+#  Features:
+#    - Select only a option or multiple options
+#    - Select or unselect multiple options easily
+#    - Select all or unselect all
+#    - Optional vim keybinds
+#    - Future: accept json from input via python script
+#    - Future: copy current option to clipboard
+#    - Future: show selected options counter for multiple options mode
+#    - Future: show custom message
+#    - Future: help tab
+#    - Future: current line and lines amount
 #
 #SOURCE
-#  <https://github.com/pedro-hs/tui-checkbox>
+#  <https://github.com/pedro-hs/terminal-checkbox>
 #
 #ADAPTED FROM
 #  <https://gist.github.com/blurayne/f63c5a8521c0eeab8e9afd8baa45c65e>
