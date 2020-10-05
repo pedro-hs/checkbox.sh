@@ -1,5 +1,7 @@
 #### fix first option is missing when pgup until end of options
 
+#### fix cursor color stay blue when press G and c
+
 #### add select and unselect mode for home/end/pgup/pgdown
 
 #### add example of usage
