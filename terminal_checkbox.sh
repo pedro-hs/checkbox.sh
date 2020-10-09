@@ -14,20 +14,25 @@
 #  <https://www.bughunter2k.de/blog/cursor-controlled-selectmenu-in-bash>
 #
 #===============================================================================
+# CONTANTS
+#===============================================================================
 readonly SELECTED="[x]"
 readonly UNSELECTED="[ ]"
+
 readonly WHITE="\e[2K\e[37m"
 readonly BLUE="\e[2K\e[34m"
 readonly RED="\e[2K\e[31m"
 readonly GREEN="\e[2K\e[32m"
 
 #===============================================================================
-# VARS
+# VARIABLES
 #===============================================================================
 options=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9" "Option 10" "Option 11" "Option 12" "Option 13" "Option 14" "Option 15" "Option 16" "Option 17" "Option 18" "Option 19" "Option 20" "Option 21" "Option 22" "Option 23" "Option 24" "Option 25" "Option 26" "Option 27" "Option 28" "Option 29" "Option 30")
+# options=("Option 1" "Option 2" "Option 3" "Option 4")
 
 cursor=0
 start_page_index=0
+end_page_index=0
 options_length=${#options[@]}
 
 has_multiple_options=false
@@ -44,59 +49,46 @@ color=$WHITE
 #===============================================================================
 # FUNCTIONS
 #===============================================================================
-draw() {
+handle_options() {
     content=""
 
     for index in ${!options[@]}; do
-        if index_in_page "$index"; then
+        if index_is_on_page "$index"; then
             local option=${options[$index]}
             [[ ${options[$cursor]} == $option ]] && set_line_color
 
-            draw_line "$index" "$option"
+            handle_option "$index" "$option"
             color=$WHITE
         fi
     done
-
-    render
 }
 
-draw_line() {
+handle_option() {
     local index=$1 option=$2
 
-    if exist_element "$index" "${selected_options[@]}"; then
-        content+="$color$SELECTED $option\n"
+    if value_in_array "$index" "${selected_options[@]}"; then
+        content+="$color  │  $SELECTED $option\n"
 
     else
-        content+="$color$UNSELECTED $option\n"
+        content+="$color  │  $UNSELECTED $option\n"
     fi
 }
 
-index_in_page() {
+index_is_on_page() {
     local index=$1
-    local terminal_width=$(get_terminal_width)
-    local end_page_index=$(get_end_page_index $terminal_width)
-    handle_start_page_index $end_page_index $terminal_width
+    end_page_index=$( get_end_page_index )
+    handle_start_page_index "$end_page_index" "$terminal_width"
 
-    return $([[ $index -ge $start_page_index && $index -le $end_page_index ]])
-}
-
-render() {
-    clear
-    echo -en "${content}"
-}
-
-get_terminal_width() {
-    local terminal_width=$(tput lines)
-    [[ $terminal_width -gt $options_length ]] && terminal_width=$options_length
-
-    echo "$terminal_width"
+    return $( [[ $index -ge $start_page_index && $index -le $end_page_index ]] )
 }
 
 get_end_page_index() {
-    local terminal_width=$1
-    local end_page_index=$(( $start_page_index + $terminal_width - 2 ))
+    local terminal_width=$( tput lines )
+    local box_size=8
+    end_page_index=$(( $start_page_index + $terminal_width - $box_size ))
 
-    [[ $end_page_index -gt $options_length ]] && end_page_index=$(( $options_length - $terminal_width ))
+    [[ $end_page_index -ge $options_length ]] && end_page_index=$options_length \
+        && start_page_index=$(( $options_length - $terminal_width - $box_size ))
 
     echo $end_page_index
 }
@@ -105,18 +97,17 @@ handle_start_page_index() {
     local end_page_index=$1
     local terminal_width=$2
 
-    if [[ $cursor -gt $end_page_index ]]; then
-        start_page_index=$(( $end_page_index + 1 ))
-        [[ $start_page_index -gt $options_length ]] && start_page_index=$(( $options_length - $terminal_width ))
+    if [[ $cursor -eq $end_page_index ]]; then
+        start_page_index=$(( $start_page_index + 1 ))
 
-    elif [[ $cursor -lt $end_page_index && ! $cursor -gt $start_page_index ]]; then
-        start_page_index=$(( "$start_page_index" - 1 ))
+    elif [[ $cursor -eq $start_page_index ]]; then
+        start_page_index=$(( $start_page_index - 1 ))
         [[ $start_page_index -lt 0 ]] && start_page_index=0
     fi
 
 }
 
-exist_element() {
+value_in_array() {
     local element=$1
     shift
     local elements=$@
@@ -153,14 +144,163 @@ set_line_color() {
     fi
 }
 
+select_many_options() {
+    if ! value_in_array "$cursor" "${selected_options[@]}" && $has_multiple_options && $select_mode_on; then
+        selected_options+=("$cursor")
+
+    elif value_in_array "$cursor" "${selected_options[@]}" && $has_multiple_options && $unselect_mode_on; then
+        selected_options=($( array_without_value "$cursor" "${selected_options[@]}" ))
+    fi
+}
+
+#===============================================================================
+# KEY ACTIONS
+#===============================================================================
+toggle_select_mode() {
+    if $has_multiple_options; then
+        unselect_mode_on=false
+
+        if $select_mode_on; then
+            select_mode_on=false
+
+        else
+            select_mode_on=true
+            selected_options+=("$cursor")
+        fi
+    fi
+}
+
+toggle_unselect_mode() {
+    if $has_multiple_options; then
+        select_mode_on=false
+
+        if $unselect_mode_on; then
+            unselect_mode_on=false
+
+        else
+            unselect_mode_on=true
+            selected_options=($( array_without_value "$cursor" "${selected_options[@]}" ))
+        fi
+    fi
+}
+
+select_all() {
+    if $has_multiple_options; then
+        selected_options=()
+
+        for index in ${!options[@]}; do
+            selected_options+=(${index})
+        done
+    fi
+}
+
+unselect_all() {
+    [[ $has_multiple_options ]] && selected_options=()
+}
+
+page_up() {
+    cursor=$(( $cursor - 5 ))
+    [[ ${cursor} -lt 0 ]] && cursor=0;
+    [[ $( tput lines + 8 ) -le ${#options[@]} ]] && start_page_index=$cursor
+}
+
+page_down() {
+    [[ $( tput lines + 8 ) -le ${#options[@]} ]] && start_page_index=$(( $cursor - 1 ))
+    cursor=$(( $cursor + 5 ))
+    last_option=${#options[@]}-1
+    [[ ${cursor} -gt $last_option ]] && cursor=$last_option
+}
+
+up() {
+    [[ $cursor -gt 0 ]] && cursor=$(( $cursor - 1 ))
+    select_many_options
+}
+
+down() {
+    [[ $cursor -lt ${#options[@]}-1 ]] && cursor=$(( $cursor + 1 ))
+    select_many_options
+}
+
+select_option() {
+    if ! value_in_array "$cursor" "${selected_options[@]}"; then
+        if $has_multiple_options; then
+            selected_options+=("$cursor")
+
+        else
+            selected_options=("$cursor")
+        fi
+
+    else
+        selected_options=($( array_without_value "$cursor" "${selected_options[@]}" ))
+    fi
+}
+
+confirm() {
+    if $will_return_index; then
+        output=${selected_options[@]}
+
+    else
+        for index in ${!options[@]}; do
+            if value_in_array "$index" "${selected_options[@]}"; then
+                output+=("${options[index]}")
+            fi
+        done
+    fi
+
+    clear
+    export output
+}
+
+copy() {
+    echo "coping"
+    echo "${options[cursor]}" | xclip -sel clip
+    echo "${options[cursor]}" | xclip
+    echo "copied"
+}
+
+home() {
+    cursor=0
+    start_page_index=0
+}
+
+end() {
+    cursor=${#options[@]}-1
+    start_page_index=$(( $cursor - $( tput lines ) + 8 ))
+}
+
+#===============================================================================
+# MAIN
+#===============================================================================
+render() {
+    handle_options
+    clear
+    echo "  ┌─────────────────────────────────────────────────────────┐"
+    echo -en "  │  message here\n"
+    echo "  ├─────────────────────────────────────────────────────────┤"
+    echo -en "$content"
+    echo -en "$WHITE"
+    echo "  ├─────────────────────────────────────────────────────────┤"
+    echo -en "  │  ${#selected_options[@]} selected  |  $(( ${cursor} + 1 ))/${#options[@]}  |  current line copied  \n"
+    echo "  └─────────────────────────────────────────────────────────┘"
+}
+
+validate_terminal_size() {
+    local terminal_width=$( tput lines )
+
+    if [[ ${#options[@]} -gt 3 && $terminal_width -lt 10 ]]; then
+        clear
+        echo "Resize the terminal to least 10 lines and press r to refresh. The current terminal has $terminal_width lines"
+    fi
+}
+
 handle_parameters() {
     while [[ $# -gt 0 ]]; do
         parameter=$1
         shift
 
         case $parameter in
-            -i) will_return_index=true;;
-            -m) has_multiple_options=true;;
+            --index) will_return_index=true;;
+            --multiple) has_multiple_options=true;;
         esac
     done
 }
@@ -192,134 +332,19 @@ handle_key_press() {
     echo "$key"
 }
 
-#===============================================================================
-# KEY ACTIONS
-#===============================================================================
-toggle_select_mode() {
-    if $has_multiple_options; then
-        unselect_mode_on=false
-
-        if $select_mode_on; then
-            select_mode_on=false
-
-        else
-            select_mode_on=true
-            selected_options+=("$cursor")
-        fi
-    fi
-}
-
-toggle_unselect_mode() {
-    if $has_multiple_options; then
-        select_mode_on=false
-
-        if $unselect_mode_on; then
-            unselect_mode_on=false
-
-        else
-            unselect_mode_on=true
-            selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
-        fi
-    fi
-}
-
-select_all() {
-    if $has_multiple_options; then
-        for index in ${!options[@]}; do
-            selected_options+=(${index})
-        done
-    fi
-}
-
-unselect_all() {
-    if $has_multiple_options; then
-        for index in ${!options[@]}; do
-            selected_options=($(array_without_value "$index" "${selected_options[@]}"))
-        done
-    fi
-}
-
-page_up() {
-    cursor=$(( $cursor - 5 ))
-
-    if [[ ${cursor} -lt 0 ]]; then
-        cursor=0;
-    fi
-}
-
-page_down() {
-    cursor=$(( $cursor + 5 ))
-    last_option=${#options[@]}-1
-
-    if [[ ${cursor} -gt $last_option ]]; then
-        cursor=$last_option
-    fi
-}
-
-up() {
-    [[ $cursor -gt 0 ]] && cursor=$(( $cursor - 1 ))
-    select_option_loop
-}
-
-down() {
-    [[ $cursor -lt ${#options[@]}-1 ]] && cursor=$(( $cursor + 1 ))
-    select_option_loop
-}
-
-select_option() {
-    if ! exist_element "$cursor" "${selected_options[@]}"; then
-        if $has_multiple_options; then
-            selected_options+=("$cursor")
-
-        else
-            selected_options=("$cursor")
-        fi
-
-    else
-        selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
-    fi
-}
-
-select_option_loop() {
-    if ! exist_element "$cursor" "${selected_options[@]}" && $has_multiple_options && $select_mode_on; then
-        selected_options+=("$cursor")
-
-    elif exist_element "$cursor" "${selected_options[@]}" && $has_multiple_options && $unselect_mode_on; then
-        selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
-    fi
-}
-
-confirm() {
-    if $will_return_index; then
-        output=${selected_options[@]}
-
-    else
-        for index in ${!options[@]}; do
-            if exist_element "$index" "${selected_options[@]}"; then
-                output+=("${options[index]}")
-            fi
-        done
-    fi
-
-    clear
-    export output
-}
-
-#===============================================================================
-# MAIN
-#===============================================================================
 main() {
     handle_parameters $1 $2
-    draw
+    render
 
     while true; do
-        local key=$(handle_key_press)
+        validate_terminal_size
+        local key=$( handle_key_press )
 
         case $key in
             _up|k) up;;
             _down|j) down;;
-            _home|g) cursor=0;;
-            _end|G) ((cursor=${#options[@]}-1));;
+            _home|g) home;;
+            _end|G) end;;
             _pgup|u) page_up;;
             _pgdown|d) page_down;;
             _esc|q) clear && exit && return;;
@@ -330,9 +355,10 @@ main() {
             r) render;;
             a) select_all;;
             A) unselect_all;;
+            c) copy;;
         esac
 
-        draw
+        render
     done
 }
 

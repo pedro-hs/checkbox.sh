@@ -1,6 +1,12 @@
-#### fix first option is missing when pgup until end of options
+#### box
+- dinamic size
+- copy message
+- message
+- show selected when -m
+- fix pg up and pg down for bigger tput lines
 
-#### fix cursor color stay blue when press G and c
+#### add selected options on start
+- parameter to run the script with options selected on start
 
 #### add select and unselect mode for home/end/pgup/pgdown
 
@@ -13,21 +19,12 @@
 
 #### create README
 
-#### create status line
-
-## STATUS LINE DEPENDENCY
 #### copy text on cursor line
 - when press c the current line data is copied to the clipboard
-- notificate on status line
-
-#### add selected lines counter
-- when -m is passed show selected lines quantity in status line
-
-#### add total of lines and current line counter
-- show lines amount and current line on status line
+- notificate the current line is copied
 
 #### show message
-- when -s is passed show message on status line
+- when -s is passed show custom message
 
 #### add help
-- when h is pressed show help in status line
+- press h for help
