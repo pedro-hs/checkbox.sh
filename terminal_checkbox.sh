@@ -10,13 +10,14 @@
 #    - Select only a option or multiple options
 #    - Select or unselect multiple options easily
 #    - Select all or unselect all
-#    - Optional vim keybinds
-#    - Future: accept json from input via python script
-#    - Future: copy current option to clipboard
-#    - Future: show selected options counter for multiple options mode
-#    - Future: show custom message
+#    - Pagination
+#    - Optional Vim keybinds
+#    - Show selected options counter for multiple options
+#    - Show custom message
+#    - Show current option index and options amount
+#    - Copy current option value to clipboard
 #    - Future: help tab
-#    - Future: current line and lines amount
+#    - Future: accept json from input via python script
 #
 #SOURCE
 #  <https://github.com/pedro-hs/terminal-checkbox>
@@ -36,89 +37,36 @@ readonly BLUE="\e[2K\e[34m"
 readonly RED="\e[2K\e[31m"
 readonly GREEN="\e[2K\e[32m"
 
+readonly INTERFACE_SIZE=6
+readonly DEFAULT_OPTIONS=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9" "Option 10" "Option 11" "Option 12" "Option 13" "Option 14" "Option 15" "Option 16" "Option 17" "Option 18" "Option 19" "Option 20" "Option 21" "Option 22" "Option 23" "Option 24" "Option 25" "Option 26" "Option 27" "Option 28" "Option 29" "Option 30")
+
 #===============================================================================
 # VARIABLES
 #===============================================================================
-options=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9" "Option 10" "Option 11" "Option 12" "Option 13" "Option 14" "Option 15" "Option 16" "Option 17" "Option 18" "Option 19" "Option 20" "Option 21" "Option 22" "Option 23" "Option 24" "Option 25" "Option 26" "Option 27" "Option 28" "Option 29" "Option 30")
-# options=("Option 1" "Option 2" "Option 3" "Option 4")
-
 cursor=0
-start_page_index=0
-end_page_index=0
-options_length=${#options[@]}
+options_length=0
+terminal_width=0
+start_page=0
+end_page=0
 
 has_multiple_options=false
 will_return_index=false
 unselect_mode_on=false
 select_mode_on=false
+copy_in_message=false
 
+options=("${DEFAULT_OPTIONS[@]}")
 output=()
 selected_options=()
 
 content=""
+message=""
+separator=""
 color=$WHITE
 
 #===============================================================================
-# FUNCTIONS
+# UTILS
 #===============================================================================
-handle_options() {
-    content=""
-
-    for index in ${!options[@]}; do
-        if index_is_on_page "$index"; then
-            local option=${options[$index]}
-            [[ ${options[$cursor]} == $option ]] && set_line_color
-
-            handle_option "$index" "$option"
-            color=$WHITE
-        fi
-    done
-}
-
-handle_option() {
-    local index=$1 option=$2
-
-    if value_in_array "$index" "${selected_options[@]}"; then
-        content+="$color  │  $SELECTED $option\n"
-
-    else
-        content+="$color  │  $UNSELECTED $option\n"
-    fi
-}
-
-index_is_on_page() {
-    local index=$1
-    end_page_index=$( get_end_page_index )
-    handle_start_page_index "$end_page_index" "$terminal_width"
-
-    return $( [[ $index -ge $start_page_index && $index -le $end_page_index ]] )
-}
-
-get_end_page_index() {
-    local terminal_width=$( tput lines )
-    local box_size=8
-    end_page_index=$(( $start_page_index + $terminal_width - $box_size ))
-
-    [[ $end_page_index -ge $options_length ]] && end_page_index=$options_length \
-        && start_page_index=$(( $options_length - $terminal_width - $box_size ))
-
-    echo $end_page_index
-}
-
-handle_start_page_index() {
-    local end_page_index=$1
-    local terminal_width=$2
-
-    if [[ $cursor -eq $end_page_index ]]; then
-        start_page_index=$(( $start_page_index + 1 ))
-
-    elif [[ $cursor -eq $start_page_index ]]; then
-        start_page_index=$(( $start_page_index - 1 ))
-        [[ $start_page_index -lt 0 ]] && start_page_index=0
-    fi
-
-}
-
 value_in_array() {
     local element=$1
     shift
@@ -144,6 +92,34 @@ array_without_value() {
     echo "${args[@]}"
 }
 
+#===============================================================================
+# AUXILIARY FUNCTIONS
+#===============================================================================
+handle_options() {
+    content=""
+
+    for index in ${!options[@]}; do
+        if [[ $index -ge $start_page && $index -le $end_page ]]; then
+            local option=${options[$index]}
+            [[ ${options[$cursor]} == $option ]] && set_line_color
+
+            handle_option "$index" "$option"
+            color=$WHITE
+        fi
+    done
+}
+
+handle_option() {
+    local index=$1 option=$2
+
+    if value_in_array "$index" "${selected_options[@]}"; then
+        content+="$color    $SELECTED $option\n"
+
+    else
+        content+="$color    $UNSELECTED $option\n"
+    fi
+}
+
 set_line_color() {
     if $has_multiple_options && $select_mode_on; then
         color=$GREEN
@@ -157,16 +133,31 @@ set_line_color() {
 }
 
 select_many_options() {
-    if ! value_in_array "$cursor" "${selected_options[@]}" && $has_multiple_options && $select_mode_on; then
-        selected_options+=("$cursor")
+    if ! value_in_array "$cursor" "${selected_options[@]}" \
+        && $has_multiple_options && $select_mode_on; then
+            selected_options+=("$cursor")
 
-    elif value_in_array "$cursor" "${selected_options[@]}" && $has_multiple_options && $unselect_mode_on; then
-        selected_options=($( array_without_value "$cursor" "${selected_options[@]}" ))
+        elif value_in_array "$cursor" "${selected_options[@]}" \
+            && $has_multiple_options && $unselect_mode_on; then
+                    selected_options=($( array_without_value "$cursor" "${selected_options[@]}" ))
     fi
 }
 
+set_options() {
+    options=()
+    options=$( echo "${opt#*=}" | sed 's/\\a//g;s/\\b//g;s/\\c//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g' )
+    readarray -t lines <<<"$options"
+    options=("${lines[@]}")
+}
+
+validate_terminal_size() {
+    [[ $terminal_width -lt 8 ]] \
+        && clear \
+        && echo "Resize the terminal to least 8 lines and press r to refresh. The current terminal has $terminal_width lines"
+}
+
 #===============================================================================
-# KEY ACTIONS
+# KEY PRESS FUNCTIONS
 #===============================================================================
 toggle_select_mode() {
     if $has_multiple_options; then
@@ -212,25 +203,71 @@ unselect_all() {
 
 page_up() {
     cursor=$(( $cursor - 5 ))
-    [[ ${cursor} -lt 0 ]] && cursor=0;
-    [[ $( tput lines + 8 ) -le ${#options[@]} ]] && start_page_index=$cursor
+
+    [[ $cursor -le $start_page ]] \
+        && start_page=$(( $cursor - 1 ))
+
+    [[ $start_page -le 0 ]] \
+        && start_page=0
+
+    [[ $cursor -le 0 ]] \
+        && cursor=0
+
+    end_page=$(( $start_page + $terminal_width - $INTERFACE_SIZE ))
 }
 
 page_down() {
-    [[ $( tput lines + 8 ) -le ${#options[@]} ]] && start_page_index=$(( $cursor - 1 ))
     cursor=$(( $cursor + 5 ))
-    last_option=${#options[@]}-1
-    [[ ${cursor} -gt $last_option ]] && cursor=$last_option
+
+    [[ $cursor -ge $end_page ]] \
+        && end_page=$(( $cursor + 1 ))
+
+    [[ $end_page -ge $options_length ]] \
+        && end_page=$(( $options_length - 1 ))
+
+    [[ $cursor -ge $options_length ]] \
+        && cursor=$(( $options_length - 1 ))
+
+    start_page=$(( $end_page + $INTERFACE_SIZE - $terminal_width ))
 }
 
 up() {
-    [[ $cursor -gt 0 ]] && cursor=$(( $cursor - 1 ))
+    [[ $cursor -gt 0 ]] \
+        && cursor=$(( $cursor - 1 ))
+
+    [[ $cursor -eq $start_page ]] \
+        && start_page=$(( $cursor - 1 ))
+
+    [[ $cursor -gt 0 ]] \
+        && end_page=$(( $start_page + $terminal_width - $INTERFACE_SIZE ))
+
     select_many_options
+
 }
 
 down() {
-    [[ $cursor -lt ${#options[@]}-1 ]] && cursor=$(( $cursor + 1 ))
+    [[ $cursor -lt $(( $options_length - 1 )) ]] \
+        && cursor=$(( $cursor + 1 ))
+
+    [[ $cursor -eq $end_page ]] \
+        && end_page=$(( $cursor + 1 ))
+
+    [[ $cursor -lt $(( $options_length - 1 )) ]] \
+        && start_page=$(( $end_page + $INTERFACE_SIZE - $terminal_width ))
+
     select_many_options
+}
+
+home() {
+    cursor=0
+    start_page=0
+    end_page=$(( $start_page + $terminal_width - $INTERFACE_SIZE ))
+}
+
+end() {
+    cursor=$(( $options_length - 1 ))
+    end_page=$(( $options_length - 1 ))
+    start_page=$(( $end_page + $INTERFACE_SIZE - $terminal_width ))
 }
 
 select_option() {
@@ -264,66 +301,51 @@ confirm() {
 }
 
 copy() {
-    echo "coping"
-    echo "${options[cursor]}" | xclip -sel clip
-    echo "${options[cursor]}" | xclip
-    echo "copied"
+    echo "${options[$cursor]}" | xclip -sel clip
+    echo "${options[$cursor]}" | xclip
+    copy_in_message=true
 }
 
-home() {
-    cursor=0
-    start_page_index=0
-}
-
-end() {
-    cursor=${#options[@]}-1
-    start_page_index=$(( $cursor - $( tput lines ) + 8 ))
+refresh() {
+    terminal_width=$( tput lines )
+    start_page=$(( $cursor - 1 ))
+    end_page=$(( $start_page + $terminal_width - $INTERFACE_SIZE ))
 }
 
 #===============================================================================
-# MAIN
+# CORE FUNCTIONS
 #===============================================================================
 render() {
+    terminal_width=$( tput lines )
     handle_options
+    footer="$(( ${cursor} + 1 ))/$options_length"
+
+    if $has_multiple_options; then
+        footer+="  |  ${#selected_options[@]} selected"
+    fi
+
+    if $copy_in_message; then
+        footer+="  |  current line copied"
+        copy_in_message=false
+    fi
+
     clear
-    echo "  ┌─────────────────────────────────────────────────────────┐"
-    echo -en "  │  message here\n"
-    echo "  ├─────────────────────────────────────────────────────────┤"
+    echo -en "  $message\n"
+    echo -en "$WHITE"
+    echo -en "$separator\n"
     echo -en "$content"
     echo -en "$WHITE"
-    echo "  ├─────────────────────────────────────────────────────────┤"
-    echo -en "  │  ${#selected_options[@]} selected  |  $(( ${cursor} + 1 ))/${#options[@]}  |  current line copied  \n"
-    echo "  └─────────────────────────────────────────────────────────┘"
+    echo -en "$separator\n"
+    echo -en "  $footer\n"
 }
 
-validate_terminal_size() {
-    local terminal_width=$( tput lines )
-
-    if [[ ${#options[@]} -gt 3 && $terminal_width -lt 10 ]]; then
-        clear
-        echo "Resize the terminal to least 10 lines and press r to refresh. The current terminal has $terminal_width lines"
-    fi
-}
-
-handle_parameters() {
-    while [[ $# -gt 0 ]]; do
-        parameter=$1
-        shift
-
-        case $parameter in
-            --index) will_return_index=true;;
-            --multiple) has_multiple_options=true;;
-        esac
-    done
-}
-
-handle_key_press() {
+get_pressed_key() {
     IFS= read -sN1 key 2>/dev/null >&2
 
     read -sN1 -t 0.0001 k1
     read -sN1 -t 0.0001 k2
     read -sN1 -t 0.0001 k3
-    key+="$k1""$k2""$k3"
+    key+="$k1$k2$k3"
 
     case $key in
         $'\x1b') key=_esc;;
@@ -344,13 +366,47 @@ handle_key_press() {
     echo "$key"
 }
 
+get_opt() {
+    while [[ $# -gt 0 ]]; do
+        opt=$1
+        shift
+
+        case $opt in
+            --index) will_return_index=true;;
+            --multiple) has_multiple_options=true;;
+            --message=*) message="${opt#*=}";;
+            --options=*) set_options;;
+            *) clear && echo "TODO: help options" && exit;;
+        esac
+    done
+}
+
+constructor() {
+    options_length=${#options[@]}
+    terminal_width=$( tput lines )
+    start_page=0
+    end_page=$(( $start_page + $terminal_width - $INTERFACE_SIZE ))
+
+    message_length=${#message}
+    if [[ $message_length -gt 40 ]]; then
+        separator=$( perl -E "say '=' x $(( $message_length + 10 ))" )
+
+    else
+        separator=$( perl -E "say '=' x 40" )
+    fi
+}
+
+#===============================================================================
+# MAIN
+#===============================================================================
 main() {
-    handle_parameters $1 $2
+    get_opt "$@"
+    constructor
     render
 
     while true; do
         validate_terminal_size
-        local key=$( handle_key_press )
+        local key=$( get_pressed_key )
 
         case $key in
             _up|k) up;;
@@ -360,19 +416,19 @@ main() {
             _pgup|u) page_up;;
             _pgdown|d) page_down;;
             _esc|q) clear && exit && return;;
-            _enter|c) confirm && return;;
+            _enter|o) confirm && return;;
             _space|x) select_option;;
             _insert|v) toggle_select_mode;;
             _backspace|V) toggle_unselect_mode;;
-            r) render;;
+            c|y) copy;;
+            r) refresh;;
             a) select_all;;
             A) unselect_all;;
-            c) copy;;
         esac
 
         render
     done
 }
 
-main $@
+main "$@"
 echo ${output[@]}
