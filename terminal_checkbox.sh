@@ -56,7 +56,6 @@ select_mode_on=false
 copy_in_message=false
 
 options=("${DEFAULT_OPTIONS[@]}")
-output=()
 selected_options=()
 
 content=""
@@ -90,6 +89,86 @@ array_without_value() {
     done
 
     echo "${args[@]}"
+}
+
+help_page_opt() {
+    clear
+    echo -e "(press q to quit)\n"
+
+    echo -e "# Avaiable options:
+
+    --multiple:
+    \tSelected multiple options
+    \tExample:
+    \t\t$ ./terminal_checkbox.sh --multiple
+
+    --selected:
+    \tStart with options in index(es) selected
+    \tExample:
+    \t\t$ ./terminal_checkbox.sh --multiple --selected=\"1;2;3;4\"
+    \t\t$ ./terminal_checkbox.sh --selected=\"1\"
+
+    --index:
+    \tReturn index instead of value
+    \tExample:
+    \t\t$ ./terminal_checkbox.sh --index
+
+    --message:
+    \tCustom message
+    \tExample:
+    \t\t$ ./terminal_checkbox.sh --message=\"this message will be shown in the header\"
+
+    --options:
+    \tMenu options
+    \tExample:
+    \t\t$ ./terminal_checkbox.sh --options=\"checkbox 1
+    \t\tcheckbox 2
+    \t\tcheckbox 3
+    \t\tcheckbox 4
+    \t\tcheckbox 5\""
+
+    echo -e "\n(press q to quit)"
+
+    while true; do
+        local key=$( get_pressed_key )
+        case $key in
+            _esc|q) clear && exit && return;;
+        esac
+    done
+}
+
+help_page_keys() {
+    clear
+    echo -e "(press q to quit)\n"
+
+    echo "# Keybinds
+
+    [ENTER]         or o: Close and return selected options
+    [SPACE]         or x: Select current option
+    [ESC]           or q: Exit
+    [UP ARROW]      or k: Move cursor to option above
+    [DOWN ARROW]    or j: Move cursor to option below
+    [HOME]          or g: Move cursor to first option
+    [END]           or G: Move cursor to last option
+    [PAGE UP]       or u: Move cursor 5 options above
+    [PAGE DOWN]     or d: Move cursor 5 options below
+    A                   : Unselect all options
+    a                   : Select all options
+
+    c               or y: Copy current option
+    [INSERT]        or v: On/Off select options during navigation (select mode)
+    [BACKSPACE]     or V: On/Off unselect options during navigation (unselect mode)
+    r                   : Refresh renderization
+    h                   : Help page"
+
+    echo -e "\n(press q to quit)"
+
+    while true; do
+        local key=$( get_pressed_key )
+        case $key in
+            _esc|q) clear && return;;
+        esac
+    done
 }
 
 #===============================================================================
@@ -154,7 +233,7 @@ validate_terminal_size() {
     [[ $terminal_width -lt 8 ]] \
         && clear \
         && echo "Resize the terminal to least 8 lines and press r to refresh. The current terminal has $terminal_width lines"
-}
+    }
 
 #===============================================================================
 # KEY PRESS FUNCTIONS
@@ -285,6 +364,8 @@ select_option() {
 }
 
 confirm() {
+    local output=()
+
     if $will_return_index; then
         output=${selected_options[@]}
 
@@ -297,7 +378,13 @@ confirm() {
     fi
 
     clear
-    export output
+    echo -e "Selected:\n"
+
+    for item in "${output[@]}"; do
+        echo "$item"
+    done
+
+    echo
 }
 
 copy() {
@@ -376,7 +463,7 @@ get_opt() {
             --multiple) has_multiple_options=true;;
             --message=*) message="${opt#*=}";;
             --options=*) set_options;;
-            *) clear && echo "TODO: help options" && exit;;
+            *) help_page_opt;;
         esac
     done
 }
@@ -386,13 +473,18 @@ constructor() {
     terminal_width=$( tput lines )
     start_page=0
     end_page=$(( $start_page + $terminal_width - $INTERFACE_SIZE ))
-
     message_length=${#message}
-    if [[ $message_length -gt 40 ]]; then
-        separator=$( perl -E "say '=' x $(( $message_length + 10 ))" )
+
+    local default_length=40
+    if $has_multiple_options; then
+        default_length=50
+    fi
+
+    if [[ $message_length -gt $default_length ]]; then
+        separator=$( perl -E "say '-' x $(( $message_length + 10 ))" )
 
     else
-        separator=$( perl -E "say '=' x 40" )
+        separator=$( perl -E "say '-' x $default_length" )
     fi
 }
 
@@ -424,6 +516,7 @@ main() {
             r) refresh;;
             a) select_all;;
             A) unselect_all;;
+            h) help_page_keys;;
         esac
 
         render
@@ -431,4 +524,3 @@ main() {
 }
 
 main "$@"
-echo ${output[@]}

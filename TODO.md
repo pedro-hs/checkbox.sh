@@ -7,7 +7,3 @@
 - create nested checkboxes passing a json data or json file with title and options
 
 #### create README
-
-#### add help
-- show keyboard commands and parameters
-- when press h or send wrong opts
