@@ -22,7 +22,7 @@
 #SOURCE
 #  <https://github.com/pedro-hs/terminal-checkbox>
 #
-#ADAPTED FROM
+#INSPIRED BY
 #  <https://gist.github.com/blurayne/f63c5a8521c0eeab8e9afd8baa45c65e>
 #  <https://www.bughunter2k.de/blog/cursor-controlled-selectmenu-in-bash>
 #
