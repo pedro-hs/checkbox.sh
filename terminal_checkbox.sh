@@ -103,29 +103,18 @@ help_page_opt() {
     \t\t$ ./terminal_checkbox.sh --multiple
 
     --selected:
-    \tStart with options in index(es) selected
-    \tExample:
+    \tStart with options in index(es) selected\n\tExample:
     \t\t$ ./terminal_checkbox.sh --multiple --selected=\"1;2;3;4\"
     \t\t$ ./terminal_checkbox.sh --selected=\"1\"
 
     --index:
-    \tReturn index instead of value
-    \tExample:
-    \t\t$ ./terminal_checkbox.sh --index
+    \tReturn index instead of value\n\tExample:\n\t\t$ ./terminal_checkbox.sh --index
 
     --message:
-    \tCustom message
-    \tExample:
-    \t\t$ ./terminal_checkbox.sh --message=\"this message will be shown in the header\"
+    \tCustom message\n\tExample:\n\t\t$ ./terminal_checkbox.sh --message=\"this message will be shown in the header\"
 
     --options:
-    \tMenu options
-    \tExample:
-    \t\t$ ./terminal_checkbox.sh --options=\"checkbox 1
-    \t\tcheckbox 2
-    \t\tcheckbox 3
-    \t\tcheckbox 4
-    \t\tcheckbox 5\""
+    \tMenu options\n\tExample:\n\t\t$ ./terminal_checkbox.sh --options=\"checkbox 1\n\t\tcheckbox 2\n\t\tcheckbox 3\n\t\tcheckbox 4\n\t\tcheckbox 5\""
 
     echo -e "\n(press q to quit)"
 
@@ -141,25 +130,28 @@ help_page_keys() {
     clear
     echo -e "(press q to quit)\n"
 
-    echo "# Keybinds
+    echo -e "# Keybinds
 
-    [ENTER]         or o: Close and return selected options
-    [SPACE]         or x: Select current option
-    [ESC]           or q: Exit
-    [UP ARROW]      or k: Move cursor to option above
-    [DOWN ARROW]    or j: Move cursor to option below
-    [HOME]          or g: Move cursor to first option
-    [END]           or G: Move cursor to last option
-    [PAGE UP]       or u: Move cursor 5 options above
-    [PAGE DOWN]     or d: Move cursor 5 options below
-    A                   : Unselect all options
-    a                   : Select all options
+    \t[ENTER]         or o: Close and return selected options
+    \t[SPACE]         or x: Select current option
+    \t[ESC]           or q: Exit
+    \t[UP ARROW]      or k: Move cursor to option above
+    \t[DOWN ARROW]    or j: Move cursor to option below
+    \t[HOME]          or g: Move cursor to first option
+    \t[END]           or G: Move cursor to last option
+    \t[PAGE UP]       or u: Move cursor 5 options above
+    \t[PAGE DOWN]     or d: Move cursor 5 options below
+    \tc               or y: Copy current option
+    \tr                   : Refresh renderization
+    \th                   : Help page"
 
-    c               or y: Copy current option
-    [INSERT]        or v: On/Off select options during navigation (select mode)
-    [BACKSPACE]     or V: On/Off unselect options during navigation (unselect mode)
-    r                   : Refresh renderization
-    h                   : Help page"
+    if $has_multiple_options; then
+        echo "
+        A                   : Unselect all options
+        a                   : Select all options
+        [INSERT]        or v: On/Off select options during navigation (select mode)
+        [BACKSPACE]     or V: On/Off unselect options during navigation (unselect mode)"
+    fi
 
     echo -e "\n(press q to quit)"
 
