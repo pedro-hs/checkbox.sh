@@ -47,17 +47,23 @@ Bash script that creates interactive checkboxes (menu) for the terminal
 > But maybe the layout will break. In this case stop the script, run the command clear and than start script again. <br />
 > Example: --message="\e[2K\e[31mhello world"
 
+<br />
+
 ### <div align="center">Return option(s) index instead of value(s)</div>
 
 ##### --index
 
 ![](demo/index.gif)
 
+<br />
+
 ### <div align="center">Select multiple options and show selected counter</div>
 
 ##### --multiple
 
 ![](demo/default_and_multiple.gif)
+
+<br />
 
 ### <div align="center">Options to render on checkboxes</div>
 
@@ -88,17 +94,23 @@ Bash script that creates interactive checkboxes (menu) for the terminal
 
 ![](demo/space.gif)
 
+<br />
+
 ### <div align="center">Close and return selected options</div>
 
 ##### Press [ENTER] or 'o'
 
 ![](demo/enter.gif)
 
+<br />
+
 ### <div align="center">Quit</div>
 
 ##### Press [ESC] or 'q'
 
 ![](demo/esc.gif)
+
+<br />
 
 ### <div align="center">Move arround</div>
 
@@ -124,17 +136,23 @@ Bash script that creates interactive checkboxes (menu) for the terminal
 
 ![](demo/home_end.gif)
 
+<br />
+
 ### <div align="center">Copy</div>
 
 ##### Press 'c' or 'y' to copy current option
 
 ![](demo/copy.gif)
 
+<br />
+
 ### <div align="center">Refresh</div>
 
 ##### Press 'r' to refresh renderization
 
 ![](demo/refresh.gif)
+
+<br />
 
 ### <div align="center">Help</div>
 

@@ -80,16 +80,17 @@ value_in_array() {
 }
 
 array_without_value() {
-    local args=() value=${1} s
+    local value=$1
     shift
+    local new_array=()
 
-    for s in ${@}; do
-        if [[ $value != $s ]]; then
-            args+=("$s")
+    for array in ${@}; do
+        if [[ $value != $array ]]; then
+            new_array+=("$array")
         fi
     done
 
-    echo "${args[@]}"
+    echo "${new_array[@]}"
 }
 
 help_page_opt() {
