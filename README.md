@@ -78,14 +78,15 @@ Bash script that creates interactive checkboxes (menu) for the terminal
 > If --options"" is missing sample options will be loaded with 30 options.
 
 <br />
+<br />
+
+## Keybinds Usage
 
 ### <div align="center">Select current option</div>
 
 ##### Press [SPACE] or 'x'
 
 ![](demo/space.gif)
-
-## Keybinds Usage
 
 ### <div align="center">Close and return selected options</div>
 
