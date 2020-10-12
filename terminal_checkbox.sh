@@ -4,7 +4,7 @@
 #  terminal_checkbox.sh
 #
 #DESCRIPTION
-#  Create checkboxes (menu) on terminal
+#  Creates interactive checkboxes (menu) for the terminal
 #  For more info look the README.md on <https://github.com/pedro-hs/terminal-checkbox>
 #  Features:
 #    - Select only a option or multiple options
@@ -16,8 +16,9 @@
 #    - Show custom message
 #    - Show current option index and options amount
 #    - Copy current option value to clipboard
-#    - Future: help tab
-#    - Future: accept json from input via python script
+#    - Help tab when press h or wrongly call the script
+#    - Cooking: start with options selected
+#    - Cooking: accept json from input via python script
 #
 #SOURCE
 #  <https://github.com/pedro-hs/terminal-checkbox>
@@ -101,11 +102,6 @@ help_page_opt() {
     \tSelected multiple options
     \tExample:
     \t\t$ ./terminal_checkbox.sh --multiple
-
-    --selected:
-    \tStart with options in index(es) selected\n\tExample:
-    \t\t$ ./terminal_checkbox.sh --multiple --selected=\"1;2;3;4\"
-    \t\t$ ./terminal_checkbox.sh --selected=\"1\"
 
     --index:
     \tReturn index instead of value\n\tExample:\n\t\t$ ./terminal_checkbox.sh --index
@@ -397,7 +393,7 @@ refresh() {
 render() {
     terminal_width=$( tput lines )
     handle_options
-    footer="$(( ${cursor} + 1 ))/$options_length"
+    footer="$(( $cursor + 1 ))/$options_length"
 
     if $has_multiple_options; then
         footer+="  |  ${#selected_options[@]} selected"
