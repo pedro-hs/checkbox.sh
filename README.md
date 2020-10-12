@@ -41,10 +41,10 @@ Bash script that creates interactive checkboxes (menu) for the terminal
 ![](demo/message.gif)
 
 > The strings \a \b \c \e \f \n \r \t \v can be used. <br />
-> But maybe the layout will break, in this case resize the terminal and press 'r'.
+> But maybe the layout will break. In this case resize the terminal and press 'r'.
 
-> You can customize message visual using ANSI colors code. <br />
-> But maybe the layout will break, in this case stop the script, run the command clear and than start script again. <br />
+> You can customize message visual using ANSI code. <br />
+> But maybe the layout will break. In this case stop the script, run the command clear and than start script again. <br />
 > Example: --message="\e[2K\e[31mhello world"
 
 ### <div align="center">Return option(s) index instead of value(s)</div>
