@@ -224,6 +224,21 @@ validate_terminal_size() {
         && echo "Resize the terminal to least 8 lines and press r to refresh. The current terminal has $terminal_width lines"
     }
 
+get_footer() {
+    footer="$(( $cursor + 1 ))/$options_length"
+
+    if $has_multiple_options; then
+        footer+="  |  ${#selected_options[@]} selected"
+    fi
+
+    if $copy_in_message; then
+        footer+="  |  current line copied"
+        copy_in_message=false
+    fi
+
+    echo "$footer"
+}
+
 #===============================================================================
 # KEY PRESS FUNCTIONS
 #===============================================================================
@@ -367,7 +382,7 @@ confirm() {
     fi
 
     clear
-    echo -e "Selected:\n"
+    echo "Selected:"
 
     for item in "${output[@]}"; do
         echo "$item"
@@ -394,16 +409,7 @@ refresh() {
 render() {
     terminal_width=$( tput lines )
     handle_options
-    footer="$(( $cursor + 1 ))/$options_length"
-
-    if $has_multiple_options; then
-        footer+="  |  ${#selected_options[@]} selected"
-    fi
-
-    if $copy_in_message; then
-        footer+="  |  current line copied"
-        copy_in_message=false
-    fi
+    footer=$( get_footer )
 
     clear
     echo -en "  $message\n"
