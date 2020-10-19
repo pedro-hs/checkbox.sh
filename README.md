@@ -1,6 +1,6 @@
 ## ⌨️ terminal_checkbox.sh
 
-[![Bash](https://img.shields.io/badge/language-Bash-green.svg)](https://github.com/pedro-hs/terminal-checkbox.sh) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/pedro-hs/terminal-checkbox.sh/master/LICENSE.md)
+[![Bash](https://img.shields.io/badge/language-Bash-green.svg)](https://raw.githubusercontent.com/pedro-hs/terminal_checkbox.sh/master/terminal_checkbox.sh) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/pedro-hs/terminal-checkbox.sh/master/LICENSE.md)
 
 Interactive checkboxes (menu) with pagination and vim keybinds for bash
 
