@@ -1,4 +1,4 @@
-# <div align="center">⌨️ Terminal Checkbox</div>
+# <div align="center">⌨️ terminal-checkbox.sh</div>
 
 Bash script that creates interactive checkboxes (menu) for the terminal
 
