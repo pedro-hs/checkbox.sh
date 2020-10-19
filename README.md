@@ -1,5 +1,7 @@
 # <div align="center">⌨️ terminal-checkbox.sh</div>
 
+[![Bash](https://img.shields.io/badge/language-Bash-green.svg)](https://github.com/pedro-hs/terminal-checkbox.sh) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/pedro-hs/terminal-checkbox.sh/LICENSE) [![Twitter]
+
 Bash script that creates interactive checkboxes (menu) for the terminal
 
 ![](demo/example.gif)
