@@ -24,6 +24,7 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 - Select all or unselect all
 - Pagination
 - Optional Vim keybinds
+- A .sh file with approximately 500 lines
 - Show selected options counter for multiple options
 - Show custom message
 - Show current option index and options amount
