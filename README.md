@@ -56,7 +56,11 @@ You can add new options:
 - With new line
 
 ```
---options="lorem ipsum<br />hello world<br />localhost<br />bash<br />test"
+--options="lorem ipsum
+hello world
+localhost
+bash
+test"
 ```
 
 <br />
@@ -64,7 +68,9 @@ You can add new options:
 - Mixed
 
 ```
---options="lorem ipsum <br />hello world|localhost<br />bash|test"
+--options="lorem ipsum
+hello world|localhost
+bash|test"
 ```
 
 <br />
