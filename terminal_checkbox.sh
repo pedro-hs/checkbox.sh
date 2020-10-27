@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 #===============================================================================
 #NAME
-#  terminal_checkbox.sh
+#  checkbox.sh
 #
 #DESCRIPTION
 #  Creates interactive checkboxes (menu) for the terminal
-#  For more info look the README.md on <https://github.com/pedro-hs/terminal-checkbox>
+#  For more info look the README.md on <https://github.com/pedro-hs/checkbox>
 #  Features:
 #    - Select only a option or multiple options
 #    - Select or unselect multiple options easily
 #    - Select all or unselect all
 #    - Pagination
 #    - Optional Vim keybinds
+#    - Start with options selected
 #    - Show selected options counter for multiple options
 #    - Show custom message
 #    - Show current option index and options amount
 #    - Copy current option value to clipboard
 #    - Help tab when press h or wrongly call the script
-#    - Cooking: start with options selected
 #    - Cooking: accept json from input via python script
 #
 #SOURCE
-#  <https://github.com/pedro-hs/terminal-checkbox>
+#  <https://github.com/pedro-hs/checkbox.sh>
 #
 #INSPIRED BY
 #  <https://gist.github.com/blurayne/f63c5a8521c0eeab8e9afd8baa45c65e>
@@ -90,16 +90,16 @@ help_page_opt() {
     --multiple:
     \tSelected multiple options
     \tExample:
-    \t\t$ ./terminal_checkbox.sh --multiple
+    \t\t$ ./checkbox.sh --multiple
 
     --index:
-    \tReturn index instead of value\n\tExample:\n\t\t$ ./terminal_checkbox.sh --index
+    \tReturn index instead of value\n\tExample:\n\t\t$ ./checkbox.sh --index
 
     --message:
-    \tCustom message\n\tExample:\n\t\t$ ./terminal_checkbox.sh --message=\"this message will be shown in the header\"
+    \tCustom message\n\tExample:\n\t\t$ ./checkbox.sh --message=\"this message will be shown in the header\"
 
     --options:
-    \tMenu options\n\tExample:\n\t\t$ ./terminal_checkbox.sh --options=\"checkbox 1\n\t\tcheckbox 2\n\t\tcheckbox 3\n\t\tcheckbox 4\n\t\tcheckbox 5\""
+    \tMenu options\n\tExample:\n\t\t$ ./checkbox.sh --options=\"checkbox 1\n\t\tcheckbox 2\n\t\tcheckbox 3\n\t\tcheckbox 4\n\t\tcheckbox 5\""
 
     echo -e "\n(press q to quit)"
 
@@ -201,9 +201,21 @@ select_many_options() {
 
 set_options() {
     options=()
-    options=$( echo "${opt#*=}" | sed 's/\\a//g;s/\\b//g;s/\\c//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g' )
-    readarray -t lines <<<"$options"
-    options=("${lines[@]}")
+    local temp_options=$( echo "${opt#*=}" | sed 's/\\a//g;s/\\b//g;s/\\c//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g' )
+    temp_options=$( echo "$temp_options" | tr '\n' '|' )
+    temp_options=$( echo "$temp_options" | sed 's/||/|/g' )
+    IFS='|' read -a temp_options <<< "$temp_options"
+
+    for index in "${!temp_options[@]}"; do
+        local option=${temp_options[index]}
+
+        if [[ ${option::1} == '+' ]]; then
+            selected_options+=("$index")
+            option=${option:1}
+        fi
+
+        options+=("$option")
+    done
 }
 
 validate_terminal_size() {
@@ -445,7 +457,7 @@ get_opt() {
             --index) will_return_index=true;;
             --multiple) has_multiple_options=true;;
             --message=*) message="${opt#*=}";;
-            --options=*) set_options;;
+            --options=*) set_options "$opt";;
             *) help_page_opt;;
         esac
     done
