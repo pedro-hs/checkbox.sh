@@ -7,6 +7,7 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 ![](demo/example.gif)
 
 <br />
+<br />
 
 ### Table of Contents
 
@@ -15,6 +16,7 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 - [ Keybinds Usage ](#keybinds-usage)
 - [ Limitations ](#limitations)
 
+<br />
 <br />
 
 ### Features
@@ -34,10 +36,9 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 - Cooking: accept json from input via python script
 
 <br />
+<br />
 
 ### Arguments Usage
-
-<br />
 
 ##### Checkbox options
 
@@ -66,20 +67,20 @@ You can add new options:
 --options="lorem ipsum <br />hello world|localhost<br />bash|test"
 ```
 
----
+<br />
 
 To start with options selected, put `+` in first character of the option
 
 - Example: `--options="+lorem ipsum|hello world|localhost|+bash|+test"`
 - The options `lorem ipsum`, `bash` and `test` will start selected
 
----
+<br />
 
 Any of this ASCII signs `\a \b \c \e \f \n \r \t \v` in any part of options will be removed.
 
 - Example: `hello w\n\c\rorld` will be `hello world`
 
----
+<br />
 
 If --options"" is missing. Sample options will be loaded with 30 options.
 
@@ -125,8 +126,6 @@ Use the argument `--multiple`
 
 ### Keybinds Usage
 
-<br />
-
 ##### Select current option
 
 Press `[SPACE]` or `x`
@@ -134,6 +133,8 @@ Press `[SPACE]` or `x`
 ![](demo/space.gif)
 
 <br />
+
+---
 
 ##### Close and return selected options
 
@@ -143,6 +144,8 @@ Press `[ENTER]` or `'o'`
 
 <br />
 
+---
+
 ##### Quit
 
 Press `[ESC]` or `'q'`
@@ -150,6 +153,8 @@ Press `[ESC]` or `'q'`
 ![](demo/esc.gif)
 
 <br />
+
+---
 
 ##### Move arround
 
@@ -169,6 +174,8 @@ Press `[PAGE DOWN]` or `'u'` to move cursor 5 options below
 
 <br />
 
+---
+
 Press `[HOME]` or `'g'` to move cursor to first option
 
 Press `[END]` or `'G'` to move cursor to last option
@@ -176,6 +183,8 @@ Press `[END]` or `'G'` to move cursor to last option
 ![](demo/home_end.gif)
 
 <br />
+
+---
 
 ##### Copy
 
@@ -185,6 +194,8 @@ Press `'c'` or `'y'` to copy current option
 
 <br />
 
+---
+
 ##### Refresh
 
 Press `'r'` to refresh renderization
@@ -192,6 +203,8 @@ Press `'r'` to refresh renderization
 ![](demo/refresh.gif)
 
 <br />
+
+---
 
 ##### Help
 
@@ -203,8 +216,6 @@ Press `'h'` or call script with invalid argument, and a help page will appear
 
 ### Keybinds for --multiple option
 
-<br />
-
 ##### Select or Unselect All
 
 Press `'a'` to select all and `'A'` to unselect all
@@ -213,20 +224,22 @@ Press `'a'` to select all and `'A'` to unselect all
 
 <br />
 
+---
+
 ##### Select or Unselect Mode
 
 Press `'v'` to turn on/off select mode `'V'` to turn on/off unselect mode
 
 ![](demo/select_unselect_mode.gif)
 
-> If select mode is on. Cursor will be green and when you navigate the options will be selected
+- If select mode is on. Cursor will be green and when you navigate the options will be selected
 
-> If unselect mode is on. Cursor will be red and when you navigate the options will be unselected
+- If unselect mode is on. Cursor will be red and when you navigate the options will be unselected
 
 <br />
 <br />
 
-## Limitations
+### Limitations
 
 - The script uses the command 'clear'
 - The script uses bash array
