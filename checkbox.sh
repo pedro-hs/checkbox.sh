@@ -5,7 +5,7 @@
 #
 #DESCRIPTION
 #  Creates interactive checkboxes (menu) for the terminal
-#  For more info look the README.md on <https://github.com/pedro-hs/checkbox>
+#  For more info look the README.md on <https://github.com/pedro-hs/checkbox.sh>
 #  Features:
 #    - Select only a option or multiple options
 #    - Select or unselect multiple options easily
