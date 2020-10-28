@@ -62,6 +62,7 @@ selected_options=()
 content=""
 message=""
 separator=""
+options_input=""
 color=$WHITE
 
 #===============================================================================
@@ -200,22 +201,27 @@ select_many_options() {
 }
 
 set_options() {
-    options=()
-    local temp_options=$( echo "${opt#*=}" | sed 's/\\a//g;s/\\b//g;s/\\c//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g' )
-    temp_options=$( echo "$temp_options" | tr '\n' '|' )
-    temp_options=$( echo "$temp_options" | sed 's/||/|/g' )
-    IFS='|' read -a temp_options <<< "$temp_options"
+    if ! [[ $options_input == '' ]]; then
+        options=()
+        local temp_options=$( echo "${options_input#*=}" | sed 's/\\a//g;s/\\b//g;s/\\c//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g' )
+        temp_options=$( echo "$temp_options" | tr '\n' '|' )
+        temp_options=$( echo "$temp_options" | sed 's/||/|/g' )
+        IFS='|' read -a temp_options <<< "$temp_options"
 
-    for index in "${!temp_options[@]}"; do
-        local option=${temp_options[index]}
+        for index in ${!temp_options[@]}; do
+            local option=${temp_options[index]}
 
-        if [[ ${option::1} == '+' ]]; then
-            selected_options+=("$index")
-            option=${option:1}
-        fi
+            if [[ ${option::1} == '+' ]]; then
+                if $has_multiple_options || [[ -z $selected_options ]]; then
+                    selected_options+=("$index")
+                fi
 
-        options+=("$option")
-    done
+                option=${option:1}
+            fi
+
+            options+=("$option")
+        done
+    fi
 }
 
 validate_terminal_size() {
@@ -457,23 +463,22 @@ get_opt() {
             --index) will_return_index=true;;
             --multiple) has_multiple_options=true;;
             --message=*) message="${opt#*=}";;
-            --options=*) set_options "$opt";;
+            --options=*) options_input="$opt";;
             *) help_page_opt;;
         esac
     done
 }
 
 constructor() {
+    set_options
+
     options_length=${#options[@]}
     terminal_width=$( tput lines )
     start_page=0
     end_page=$(( $start_page + $terminal_width - $INTERFACE_SIZE ))
-    message_length=${#message}
 
-    local default_length=40
-    if $has_multiple_options; then
-        default_length=50
-    fi
+    local message_length=${#message}
+    local default_length=50
 
     if [[ $message_length -gt $default_length ]]; then
         separator=$( perl -E "say '-' x $(( $message_length + 10 ))" )

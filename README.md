@@ -1,13 +1,12 @@
-### ⌨️ checkbox.sh
+### ⌨️ checkbqox.sh
 
 [![Bash](https://img.shields.io/badge/language-Bash-green.svg)](https://github.com/pedro-hs/checkbox.sh/blob/master/checkbox.sh) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/pedro-hs/terminal-checkbox.sh/master/LICENSE.md)
 
 Interactive checkboxes (menu) with pagination and vim keybinds for bash
 
-![](demo/example.gif)
+![](example/demo.gif)
 
-<br />
-<br />
+<br /><br />
 
 ### Table of Contents
 
@@ -44,51 +43,43 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 
 Use the argument `--options=""`
 
-![](demo/example.gif)
-
 You can add new options:
 
-- With the charecter `|`<br/>
-  `--options="lorem ipsum|hello world|localhost|bash|test"`
+- With the character `|`
+
+![](example/options/options_separator.gif)
 
 <br />
 
 - With new line
 
-```
---options="lorem ipsum
-hello world
-localhost
-bash
-test"
-```
+![](example/options/options_new_line.gif)
 
 <br />
 
 - Mixed
 
-```
---options="lorem ipsum
-hello world|localhost
-bash|test"
-```
+![](example/options/options_mixed.gif)
 
 <br />
 
 To start with options selected, put `+` in first character of the option
 
-- Example: `--options="+lorem ipsum|hello world|localhost|+bash|+test"`
-- The options `lorem ipsum`, `bash` and `test` will start selected
+- If the argument --multiple is missing, just the first option marked with + will start selected
+
+![](example/options/options_start_seleted.gif)
 
 <br />
 
 Any of this ASCII signs `\a \b \c \e \f \n \r \t \v` in any part of options will be removed.
 
-- Example: `hello w\n\c\rorld` will be `hello world`
+![](example/options/options_ascii.gif)
 
 <br />
 
 If --options"" is missing. Sample options will be loaded with 30 options.
+
+![](example/options/no_options.gif)
 
 <br />
 
@@ -98,9 +89,9 @@ If --options"" is missing. Sample options will be loaded with 30 options.
 
 Use the argument `--message=""`
 
-![](demo/message.gif)
+![](example/message.gif)
 
-You can customize message (maybe the layout breaks):
+You can customize message
 
 - Using ANSI <br />
   Example: `--message="\e[2K\e[31mhello world"`
@@ -108,15 +99,7 @@ You can customize message (maybe the layout breaks):
 - Using ASCII `\a \b \c \e \f \n \r \t \v` <br />
   Example: `--message="hello\rworld"`
 
-<br />
-
----
-
-##### Return index instead of values
-
-Use the argument `--index`
-
-![](demo/index.gif)
+- Maybe the layout breaks, in this case, try to refresh (press `r`)
 
 <br />
 
@@ -126,17 +109,55 @@ Use the argument `--index`
 
 Use the argument `--multiple`
 
-![](demo/default_and_multiple.gif)
+![](example/multiple.gif)
+
+<br />
+
+---
+
+##### Return index instead of values
+
+Use the argument `--index`
+
+![](example/index.gif)
 
 <br />
 
 ### Keybinds Usage
 
+##### Move arround
+
+Press `[UP ARROW]` or `'k'` to move cursor to option above
+
+Press `[UP DOWN]` or `'j'` to move cursor to option below
+
+![](example/keys/up_down.gif)
+
+<br />
+
+Press `[PAGE UP]` or `'d'` to move cursor 5 options above
+
+Press `[PAGE DOWN]` or `'u'` to move cursor 5 options below
+
+![](example/keys/page_up_down.gif)
+
+<br />
+
+Press `[HOME]` or `'g'` to move cursor to first option
+
+Press `[END]` or `'G'` to move cursor to last option
+
+![](example/keys/home_end.gif)
+
+<br />
+
+---
+
 ##### Select current option
 
 Press `[SPACE]` or `x`
 
-![](demo/space.gif)
+![](example/keys/confirm.gif)
 
 <br />
 
@@ -146,7 +167,31 @@ Press `[SPACE]` or `x`
 
 Press `[ENTER]` or `'o'`
 
-![](demo/enter.gif)
+![](example/keys/confirm.gif)
+
+<br />
+
+---
+
+##### Select or Unselect All (only with --multiple)
+
+Press `'a'` to select all and `'A'` to unselect all
+
+![](example/all.gif)
+
+<br />
+
+---
+
+##### Select or Unselect Mode (only with --multiple)
+
+Press `'v'` to turn on/off select mode `'V'` to turn on/off unselect mode
+
+![](example/select_unselect.gif)
+
+- If select mode is on. Cursor will be green and when you navigate the options will be selected
+
+- If unselect mode is on. Cursor will be red and when you navigate the options will be unselected
 
 <br />
 
@@ -156,37 +201,7 @@ Press `[ENTER]` or `'o'`
 
 Press `[ESC]` or `'q'`
 
-![](demo/esc.gif)
-
-<br />
-
----
-
-##### Move arround
-
-Press `[UP ARROW]` or `'k'` to move cursor to option above
-
-Press `[UP DOWN]` or `'j'` to move cursor to option below
-
-![](demo/up_down_arrow.gif)
-
-<br />
-
-Press `[PAGE UP]` or `'d'` to move cursor 5 options above
-
-Press `[PAGE DOWN]` or `'u'` to move cursor 5 options below
-
-![](demo/page_up_down.gif)
-
-<br />
-
----
-
-Press `[HOME]` or `'g'` to move cursor to first option
-
-Press `[END]` or `'G'` to move cursor to last option
-
-![](demo/home_end.gif)
+![](example/keys/quit.gif)
 
 <br />
 
@@ -196,7 +211,7 @@ Press `[END]` or `'G'` to move cursor to last option
 
 Press `'c'` or `'y'` to copy current option
 
-![](demo/copy.gif)
+![](example/copy.gif)
 
 <br />
 
@@ -206,7 +221,7 @@ Press `'c'` or `'y'` to copy current option
 
 Press `'r'` to refresh renderization
 
-![](demo/refresh.gif)
+![](example/refresh.gif)
 
 <br />
 
@@ -216,31 +231,7 @@ Press `'r'` to refresh renderization
 
 Press `'h'` or call script with invalid argument, and a help page will appear
 
-![](demo/help.gif)
-
-<br />
-
-### Keybinds for --multiple option
-
-##### Select or Unselect All
-
-Press `'a'` to select all and `'A'` to unselect all
-
-![](demo/select_unselect_all.gif)
-
-<br />
-
----
-
-##### Select or Unselect Mode
-
-Press `'v'` to turn on/off select mode `'V'` to turn on/off unselect mode
-
-![](demo/select_unselect_mode.gif)
-
-- If select mode is on. Cursor will be green and when you navigate the options will be selected
-
-- If unselect mode is on. Cursor will be red and when you navigate the options will be unselected
+![](example/help.gif)
 
 <br />
 <br />
@@ -249,6 +240,5 @@ Press `'v'` to turn on/off select mode `'V'` to turn on/off unselect mode
 
 - The script uses the command 'clear'
 - The script uses bash array
-- Terminal must have +8 lines for the script works
-- When message has customizations like colors or line break, the script doesn't validate the terminal size well
+- Terminal must have +8 lines for the script works (except for customizations in --mesage="", maybe the layout breaks)
 - The script don't have any test until now
