@@ -239,5 +239,5 @@ Press `'h'` or call script with invalid argument, and a help page will appear
 
 - The script uses the command 'clear'
 - The script uses bash array
-- Terminal must have +8 lines for the script works (except for customizations in --mesage="", maybe the layout breaks)
+- Terminal must have +8 lines for the script works (except for customizations in --message)
 - The script don't have any test until now
