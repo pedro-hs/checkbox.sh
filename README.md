@@ -32,7 +32,6 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 - Show current option index and options amount
 - Copy current option value to clipboard
 - Help tab when press h or wrongly call the script
-- Cooking: accept json from input via python script
 
 <br />
 <br />

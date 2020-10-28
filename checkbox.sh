@@ -18,7 +18,6 @@
 #    - Show current option index and options amount
 #    - Copy current option value to clipboard
 #    - Help tab when press h or wrongly call the script
-#    - Cooking: accept json from input via python script
 #
 #SOURCE
 #  <https://github.com/pedro-hs/checkbox.sh>
@@ -85,22 +84,12 @@ array_without_value() {
 help_page_opt() {
     clear
     echo -e "(press q to quit)\n"
-
     echo -e "# Avaiable options:
 
-    --multiple:
-    \tSelected multiple options
-    \tExample:
-    \t\t$ ./checkbox.sh --multiple
-
-    --index:
-    \tReturn index instead of value\n\tExample:\n\t\t$ ./checkbox.sh --index
-
-    --message:
-    \tCustom message\n\tExample:\n\t\t$ ./checkbox.sh --message=\"this message will be shown in the header\"
-
-    --options:
-    \tMenu options\n\tExample:\n\t\t$ ./checkbox.sh --options=\"checkbox 1\n\t\tcheckbox 2\n\t\tcheckbox 3\n\t\tcheckbox 4\n\t\tcheckbox 5\""
+    --multiple:\n\tSelected multiple options\n\tExample:\n\t\t$ ./checkbox.sh --multiple
+    --index:\n\tReturn index instead of value\n\tExample:\n\t\t$ ./checkbox.sh --index
+    --message:\n\tCustom message\n\tExample:\n\t\t$ ./checkbox.sh --message=\"this message will be shown in the header\"
+    --options:\n\tMenu options\n\tExample:\n\t\t$ ./checkbox.sh --options=\"checkbox 1\n\t\tcheckbox 2\n\t\tcheckbox 3\n\t\tcheckbox 4\n\t\tcheckbox 5\""
 
     echo -e "\n(press q to quit)"
 
@@ -115,7 +104,6 @@ help_page_opt() {
 help_page_keys() {
     clear
     echo -e "(press q to quit)\n"
-
     echo -e "# Keybinds
 
     \t[ENTER]         or o: Close and return selected options
@@ -158,8 +146,8 @@ handle_options() {
     for index in ${!options[@]}; do
         if [[ $index -ge $start_page && $index -le $end_page ]]; then
             local option=${options[$index]}
-            [[ ${options[$cursor]} == $option ]] && set_line_color
 
+            [[ ${options[$cursor]} == $option ]] && set_line_color
             handle_option "$index" "$option"
             color=$WHITE
         fi
@@ -203,6 +191,7 @@ select_many_options() {
 set_options() {
     if ! [[ $options_input == '' ]]; then
         options=()
+
         local temp_options=$( echo "${options_input#*=}" | sed 's/\\a//g;s/\\b//g;s/\\c//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g' )
         temp_options=$( echo "$temp_options" | tr '\n' '|' )
         temp_options=$( echo "$temp_options" | sed 's/||/|/g' )
@@ -225,10 +214,11 @@ set_options() {
 }
 
 validate_terminal_size() {
-    [[ $terminal_width -lt 8 ]] \
-        && clear \
-        && echo "Resize the terminal to least 8 lines and press r to refresh. The current terminal has $terminal_width lines"
-    }
+    if [[ $terminal_width -lt 8 ]]; then
+        clear
+        echo "Resize the terminal to least 8 lines and press r to refresh. The current terminal has $terminal_width lines"
+    fi
+}
 
 get_footer() {
     footer="$(( $cursor + 1 ))/$options_length"
@@ -375,6 +365,8 @@ select_option() {
 
 confirm() {
     local output=()
+    clear
+    echo "Selected:"
 
     if $will_return_index; then
         output=${selected_options[@]}
@@ -386,9 +378,6 @@ confirm() {
             fi
         done
     fi
-
-    clear
-    echo "Selected:"
 
     for item in "${output[@]}"; do
         echo "$item"
