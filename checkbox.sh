@@ -223,7 +223,7 @@ validate_terminal_size() {
 }
 
 get_footer() {
-    footer="$(( $cursor + 1 ))/$options_length"
+    local footer="$(( $cursor + 1 ))/$options_length"
 
     if $has_multiple_options; then
         footer+="  |  ${#selected_options[@]} selected"
@@ -401,7 +401,7 @@ refresh() {
 render() {
     terminal_width=$( tput lines )
     handle_options
-    footer=$( get_footer )
+    local footer=$( get_footer )
     clear
 
     local output="  $message\n"
