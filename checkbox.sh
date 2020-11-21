@@ -83,15 +83,16 @@ array_without_value() {
 
 help_page_opt() {
     clear
-    echo -e "(press q to quit)\n"
-    echo -e "# Avaiable options:
+    local output="(press q to quit)\n"
+    output+="# Avaiable options:
 
     --multiple:\n\tSelected multiple options\n\tExample:\n\t\t$ ./checkbox.sh --multiple
     --index:\n\tReturn index instead of value\n\tExample:\n\t\t$ ./checkbox.sh --index
     --message:\n\tCustom message\n\tExample:\n\t\t$ ./checkbox.sh --message=\"this message will be shown in the header\"
     --options:\n\tMenu options\n\tExample:\n\t\t$ ./checkbox.sh --options=\"checkbox 1\n\t\tcheckbox 2\n\t\tcheckbox 3\n\t\tcheckbox 4\n\t\tcheckbox 5\""
 
-    echo -e "\n(press q to quit)"
+    output+="\n(press q to quit)"
+    echo -e "$output"
 
     while true; do
         local key=$( get_pressed_key )
@@ -103,8 +104,8 @@ help_page_opt() {
 
 help_page_keys() {
     clear
-    echo -e "(press q to quit)\n"
-    echo -e "# Keybinds
+    local output="(press q to quit)\n"
+    output+="# Keybinds
 
     \t[ENTER]         or o: Close and return selected options
     \t[SPACE]         or x: Select current option
@@ -120,14 +121,15 @@ help_page_keys() {
     \th                   : Help page"
 
     if $has_multiple_options; then
-        echo "
+        output+="
         A                   : Unselect all options
         a                   : Select all options
         [INSERT]        or v: On/Off select options during navigation (select mode)
         [BACKSPACE]     or V: On/Off unselect options during navigation (unselect mode)"
     fi
 
-    echo -e "\n(press q to quit)"
+    output+="\n(press q to quit)"
+    echo -e "$output"
 
     while true; do
         local key=$( get_pressed_key )
@@ -366,7 +368,6 @@ select_option() {
 confirm() {
     local output=()
     clear
-    echo "Selected:"
 
     if $will_return_index; then
         output=${selected_options[@]}
@@ -374,16 +375,12 @@ confirm() {
     else
         for index in ${!options[@]}; do
             if [[ ${selected_options[*]} == *"$index"* ]]; then
-                output+=("${options[index]}")
+                output+="${options[index]}\n"
             fi
         done
     fi
 
-    for item in "${output[@]}"; do
-        echo "$item"
-    done
-
-    echo
+    echo -e "${output[*]}"
 }
 
 copy() {
@@ -405,15 +402,17 @@ render() {
     terminal_width=$( tput lines )
     handle_options
     footer=$( get_footer )
-
     clear
-    echo -en "  $message\n"
-    echo -en "$WHITE"
-    echo -en "$separator\n"
-    echo -en "$content"
-    echo -en "$WHITE"
-    echo -en "$separator\n"
-    echo -en "  $footer\n"
+
+    local output="  $message\n"
+    output+="$WHITE"
+    output+="$separator\n"
+    output+="$content"
+    output+="$WHITE"
+    output+="$separator\n"
+    output+="  $footer\n"
+
+    echo -en "$output"
 }
 
 get_pressed_key() {
