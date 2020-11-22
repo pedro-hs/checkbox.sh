@@ -107,23 +107,14 @@ help_page_keys() {
     local output="(press q to quit)\n"
     output+="# Keybinds
 
-    \t[ENTER]         or o: Close and return selected options
-    \t[SPACE]         or x: Select current option
-    \t[ESC]           or q: Exit
-    \t[UP ARROW]      or k: Move cursor to option above
-    \t[DOWN ARROW]    or j: Move cursor to option below
-    \t[HOME]          or g: Move cursor to first option
-    \t[END]           or G: Move cursor to last option
-    \t[PAGE UP]       or u: Move cursor 5 options above
-    \t[PAGE DOWN]     or d: Move cursor 5 options below
-    \tc               or y: Copy current option
-    \tr                   : Refresh renderization
-    \th                   : Help page"
+    \t[ENTER]         or o: Close and return selected options\n\t[SPACE]         or x: Select current option
+    \t[ESC]           or q: Exit\n\t[UP ARROW]      or k: Move cursor to option above\n\t[DOWN ARROW]    or j: Move cursor to option below
+    \t[HOME]          or g: Move cursor to first option\n\t[END]           or G: Move cursor to last option
+    \t[PAGE UP]       or u: Move cursor 5 options above\n\t[PAGE DOWN]     or d: Move cursor 5 options below
+    \tc               or y: Copy current option\n\tr                   : Refresh renderization\n\th                   : Help page"
 
     if $has_multiple_options; then
-        output+="
-        A                   : Unselect all options
-        a                   : Select all options
+        output+="\n\tA                   : Unselect all options\n\ta                   : Select all options
         [INSERT]        or v: On/Off select options during navigation (select mode)
         [BACKSPACE]     or V: On/Off unselect options during navigation (unselect mode)"
     fi
@@ -366,11 +357,11 @@ select_option() {
 }
 
 confirm() {
-    local output=()
+    local output
     clear
 
     if $will_return_index; then
-        output=${selected_options[@]}
+        output="${selected_options[@]}"
 
     else
         for index in ${!options[@]}; do
@@ -380,7 +371,11 @@ confirm() {
         done
     fi
 
-    echo -e "${output[*]}"
+    [[ -z $output ]] && echo 'None selected' || echo -e "$output"
+}
+
+quit() {
+    clear && echo 'Exit'
 }
 
 copy() {
@@ -401,7 +396,7 @@ refresh() {
 render() {
     terminal_width=$( tput lines )
     handle_options
-    local footer=$( get_footer )
+    local footer="$( get_footer )"
     clear
 
     local output="  $message\n"
@@ -495,7 +490,7 @@ main() {
             _end|G) end;;
             _pgup|u) page_up;;
             _pgdown|d) page_down;;
-            _esc|q) clear && exit && return;;
+            _esc|q) quit && return;;
             _enter|o) confirm && return;;
             _space|x) select_option;;
             _insert|v) toggle_select_mode;;
