@@ -197,7 +197,6 @@ set_options() {
                 if $has_multiple_options || [[ -z $selected_options ]]; then
                     selected_options+=("$index")
                 fi
-
                 option=${option:1}
             fi
 
@@ -314,7 +313,6 @@ up() {
         && end_page=$(( $start_page + $terminal_width - $INTERFACE_SIZE ))
 
     select_many_options
-
 }
 
 down() {
@@ -344,12 +342,9 @@ end() {
 
 select_option() {
     if [[ ! ${selected_options[*]} == *"$cursor"* ]]; then
-        if $has_multiple_options; then
-            selected_options+=("$cursor")
-
-        else
-            selected_options=("$cursor")
-        fi
+        $has_multiple_options \
+            && selected_options+=("$cursor") \
+            || selected_options=("$cursor")
 
     else
         selected_options=($( array_without_value "$cursor" "${selected_options[@]}" ))
@@ -400,22 +395,20 @@ render() {
     clear
 
     local output="  $message\n"
-    output+="$WHITE"
-    output+="$separator\n"
+    output+="$WHITE$separator\n"
     output+="$content"
-    output+="$WHITE"
-    output+="$separator\n"
+    output+="$WHITE$separator\n"
     output+="  $footer\n"
 
     echo -en "$output"
 }
 
 get_pressed_key() {
-    IFS= read -sN1 key 2>/dev/null >&2
+    IFS= read -sn1 key 2>/dev/null >&2
 
-    read -sN1 -t 0.0001 k1
-    read -sN1 -t 0.0001 k2
-    read -sN1 -t 0.0001 k3
+    read -sn1 -t 0.0001 k1
+    read -sn1 -t 0.0001 k2
+    read -sn1 -t 0.0001 k3
     key+="$k1$k2$k3"
 
     case $key in
@@ -460,15 +453,11 @@ constructor() {
     start_page=0
     end_page=$(( $start_page + $terminal_width - $INTERFACE_SIZE ))
 
-    local message_length=${#message}
-    local default_length=50
+    [[ ${#message} -gt 40 ]] \
+        && message_length=$(( ${#message} + 10 )) \
+        || message_length=50
 
-    if [[ $message_length -gt $default_length ]]; then
-        separator=$( perl -E "say '-' x $(( $message_length + 10 ))" )
-
-    else
-        separator=$( perl -E "say '-' x $default_length" )
-    fi
+    separator=$( perl -E "say '-' x $message_length" )
 }
 
 #===============================================================================
