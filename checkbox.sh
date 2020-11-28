@@ -182,18 +182,18 @@ select_many_options() {
 }
 
 set_options() {
-    if ! [[ $options_input == '' ]]; then
+    if ! [[ $options_input == "" ]]; then
         options=()
 
-        local temp_options=$( echo "${options_input#*=}" | sed 's/\\a//g;s/\\b//g;s/\\c//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g' )
-        temp_options=$( echo "$temp_options" | tr '\n' '|' )
-        temp_options=$( echo "$temp_options" | sed 's/||/|/g' )
-        IFS='|' read -a temp_options <<< "$temp_options"
+        local temp_options=$( echo "${options_input#*=}" | sed "s/\\a//g;s/\\b//g;s/\\c//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g" )
+        temp_options=$( echo "$temp_options" | tr "\n" "|" )
+        temp_options=$( echo "$temp_options" | sed "s/||/|/g" )
+        IFS="|" read -a temp_options <<< "$temp_options"
 
         for index in ${!temp_options[@]}; do
             local option=${temp_options[index]}
 
-            if [[ ${option::1} == '+' ]]; then
+            if [[ ${option::1} == "+" ]]; then
                 if $has_multiple_options || [[ -z $selected_options ]]; then
                     selected_options+=("$index")
                 fi
@@ -366,11 +366,11 @@ confirm() {
         done
     fi
 
-    [[ -z $output ]] && echo 'None selected' || echo -e "$output"
+    [[ -z $output ]] && echo "None selected" || echo -e "$output"
 }
 
 quit() {
-    clear && echo 'Exit'
+    clear && echo "Exit"
 }
 
 copy() {
