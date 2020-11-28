@@ -150,7 +150,7 @@ handle_options() {
 handle_option() {
     local index=$1 option=$2
 
-    if [[ ${selected_options[*]} == *"$index"*  ]]; then
+    if [[ ${selected_options[*]} == *$index*  ]]; then
         content+="$color    $SELECTED $option\n"
 
     else
@@ -171,11 +171,11 @@ set_line_color() {
 }
 
 select_many_options() {
-    if [[ ! ${selected_options[*]} == *"$cursor"* ]] \
+    if [[ ! ${selected_options[*]} == *$cursor* ]] \
         && $has_multiple_options && $select_mode_on; then
             selected_options+=("$cursor")
 
-        elif [[ ${selected_options[*]} == *"$cursor"* ]] \
+        elif [[ ${selected_options[*]} == *$cursor* ]] \
             && $has_multiple_options && $unselect_mode_on; then
                     selected_options=($( array_without_value "$cursor" "${selected_options[@]}" ))
     fi
@@ -341,7 +341,7 @@ end() {
 }
 
 select_option() {
-    if [[ ! ${selected_options[*]} == *"$cursor"* ]]; then
+    if [[ ! ${selected_options[*]} == *$cursor* ]]; then
         $has_multiple_options \
             && selected_options+=("$cursor") \
             || selected_options=("$cursor")
@@ -360,7 +360,7 @@ confirm() {
 
     else
         for index in ${!options[@]}; do
-            if [[ ${selected_options[*]} == *"$index"* ]]; then
+            if [[ ${selected_options[*]} == *$index* ]]; then
                 output+="${options[index]}\n"
             fi
         done
