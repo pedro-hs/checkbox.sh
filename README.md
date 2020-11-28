@@ -11,6 +11,7 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 ### Table of Contents
 
 - [ Features ](#features)
+- [ Quick Start ](#quick-start)
 - [ Arguments Usage ](#arguments-usage)
 - [ Keybinds Usage ](#keybinds-usage)
 - [ Limitations ](#limitations)
@@ -34,6 +35,11 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 - Help tab when press h or wrongly call the script
 
 <br />
+
+### Quick Start
+
+Run the script (in bash shell) with `source checkbox.sh`
+
 <br />
 
 ### Arguments Usage
@@ -42,20 +48,12 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 
 Use the argument `--options=""`
 
+<br />
+
 You can add new options:
 
 - With the character `|`
-
-![](example/options/options_separator.gif)
-
-<br />
-
 - With new line
-
-![](example/options/options_new_line.gif)
-
-<br />
-
 - Mixed
 
 ![](example/options/options_mixed.gif)
@@ -130,23 +128,13 @@ Press `[UP ARROW]` or `'k'` to move cursor to option above
 
 Press `[UP DOWN]` or `'j'` to move cursor to option below
 
-![](example/keys/up_down.gif)
-
-<br />
-
 Press `[PAGE UP]` or `'d'` to move cursor 5 options above
 
 Press `[PAGE DOWN]` or `'u'` to move cursor 5 options below
 
-![](example/keys/page_up_down.gif)
-
-<br />
-
 Press `[HOME]` or `'g'` to move cursor to first option
 
 Press `[END]` or `'G'` to move cursor to last option
-
-![](example/keys/home_end.gif)
 
 <br />
 
@@ -156,31 +144,19 @@ Press `[END]` or `'G'` to move cursor to last option
 
 Press `[SPACE]` or `x`
 
-![](example/keys/confirm.gif)
-
 <br />
-
----
 
 ##### Close and return selected options
 
 Press `[ENTER]` or `'o'`
 
-![](example/keys/confirm.gif)
-
 <br />
-
----
 
 ##### Select or Unselect All (only with --multiple)
 
 Press `'a'` to select all and `'A'` to unselect all
 
-![](example/all.gif)
-
 <br />
-
----
 
 ##### Select or Unselect Mode (only with --multiple)
 
@@ -188,29 +164,9 @@ Press `'v'` to turn on/off select mode `'V'` to turn on/off unselect mode
 
 ![](example/select_unselect.gif)
 
-- If select mode is on. Cursor will be green and when you navigate the options will be selected
+- If select mode is on. Cursor will be green and when you move up or down the options will be selected
 
-- If unselect mode is on. Cursor will be red and when you navigate the options will be unselected
-
-<br />
-
----
-
-##### Quit
-
-Press `[ESC]` or `'q'`
-
-![](example/keys/quit.gif)
-
-<br />
-
----
-
-##### Copy
-
-Press `'c'` or `'y'` to copy current option
-
-![](example/copy.gif)
+- If unselect mode is on. Cursor will be red and when you move up or down the options will be unselected
 
 <br />
 
