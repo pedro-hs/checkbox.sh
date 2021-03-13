@@ -15,6 +15,7 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 - [ Arguments Usage ](#arguments-usage)
 - [ Keybinds Usage ](#keybinds-usage)
 - [ Limitations ](#limitations)
+- [ How to use with another script ](#how-to-use-with-another-script)
 
 <br />
 <br />
@@ -68,7 +69,7 @@ To start with options selected, put `+` in first character of the option
 
 <br />
 
-Any of this ASCII signs `\a \b \c \e \f \n \r \t \v` in any part of options will be removed.
+Any of this ASCII signs `\a \b \e \f \n \r \t \v` in any part of options will be removed.
 
 ![](example/options/options_ascii.gif)
 
@@ -93,7 +94,7 @@ You can customize message
 - Using ANSI <br />
   Example: `--message="\e[2K\e[31mhello world"`
   <br /><br />
-- Using ASCII `\a \b \c \e \f \n \r \t \v` <br />
+- Using ASCII `\a \b \e \f \n \r \t \v` <br />
   Example: `--message="hello\rworld"`
 
 - Maybe the layout breaks, in this case, try to refresh (press `r`)
@@ -187,6 +188,26 @@ Press `'r'` to refresh renderization
 Press `'h'` or call script with invalid argument, and a help page will appear
 
 ![](example/help.gif)
+
+<br />
+<br />
+
+### How to use with another script
+
+- Call the script
+- Send the output to a file
+- Assign the file content to a variable
+- Delete the file
+
+<br />
+
+- Example:
+
+```
+source checkbox.sh --multiple | tee log.txt
+selected_option=$(< log.txt)
+rm log.txt
+```
 
 <br />
 <br />

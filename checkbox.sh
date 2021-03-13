@@ -97,7 +97,7 @@ help_page_opt() {
     while true; do
         local key=$( get_pressed_key )
         case $key in
-            _esc|q) clear && exit && return;;
+            _esc|q) exit && return;;
         esac
     done
 }
@@ -125,7 +125,7 @@ help_page_keys() {
     while true; do
         local key=$( get_pressed_key )
         case $key in
-            _esc|q) clear && return;;
+            _esc|q) return;;
         esac
     done
 }
@@ -185,9 +185,9 @@ set_options() {
     if ! [[ $options_input == "" ]]; then
         options=()
 
-        local temp_options=$( echo "${options_input#*=}" | sed "s/\\a//g;s/\\b//g;s/\\c//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g" )
+        local temp_options=$( echo "${options_input#*=}" | sed "s/\\a//g;s/\\b//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g" )
+        temp_options=$( echo "$temp_options" | sed "s/|\+/|/g" )
         temp_options=$( echo "$temp_options" | tr "\n" "|" )
-        temp_options=$( echo "$temp_options" | sed "s/||/|/g" )
         IFS="|" read -a temp_options <<< "$temp_options"
 
         for index in ${!temp_options[@]}; do
@@ -353,7 +353,6 @@ select_option() {
 
 confirm() {
     local output
-    clear
 
     if $will_return_index; then
         output="${selected_options[@]}"
@@ -366,6 +365,7 @@ confirm() {
         done
     fi
 
+    clear
     [[ -z $output ]] && echo "None selected" || echo -e "$output"
 }
 
