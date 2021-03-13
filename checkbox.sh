@@ -32,10 +32,10 @@
 readonly SELECTED="[x]"
 readonly UNSELECTED="[ ]"
 
-readonly WHITE="\e[2K\e[37m"
-readonly BLUE="\e[2K\e[34m"
-readonly RED="\e[2K\e[31m"
-readonly GREEN="\e[2K\e[32m"
+readonly WHITE="\033[2K\033[37m"
+readonly BLUE="\033[2K\033[34m"
+readonly RED="\033[2K\033[31m"
+readonly GREEN="\033[2K\033[32m"
 
 readonly INTERFACE_SIZE=6
 readonly DEFAULT_OPTIONS=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9" "Option 10" "Option 11" "Option 12" "Option 13" "Option 14" "Option 15" "Option 16" "Option 17" "Option 18" "Option 19" "Option 20" "Option 21" "Option 22" "Option 23" "Option 24" "Option 25" "Option 26" "Option 27" "Option 28" "Option 29" "Option 30")
@@ -412,19 +412,17 @@ get_pressed_key() {
     key+="$k1$k2$k3"
 
     case $key in
-        $'\x1b') key=_esc;;
-        ' ') key=_space;;
         '') key=_enter;;
-        $'\e') key=_enter;;
-        $'\x0a') key=_enter;;
+        ' ') key=_space;;
+        $'\x1b') key=_esc;;
+        $'\e[F') key=_end;;
+        $'\e[H') key=_home;;
         $'\x7f') key=_backspace;;
         $'\x1b\x5b\x32\x7e') key=_insert;;
+        $'\x1b\x5b\x41') key=_up;;
+        $'\x1b\x5b\x42') key=_down;;
         $'\x1b\x5b\x35\x7e') key=_pgup;;
         $'\x1b\x5b\x36\x7e') key=_pgdown;;
-        $'\e[1~'|$'\e0H'|$'\e[H') key=_home;;
-        $'\e[4~'|$'\e0F'|$'\e[F') key=_end;;
-        $'\e[A'|$'\e0A  '|$'\e[D'|$'\e0D') key=_up;;
-        $'\e[B'|$'\e0B'|$'\e[C'|$'\e0C') key=_down;;
     esac
 
     echo "$key"
