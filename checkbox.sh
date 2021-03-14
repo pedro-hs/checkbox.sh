@@ -63,6 +63,7 @@ message=""
 separator=""
 options_input=""
 color=$WHITE
+checkbox_output=""
 
 #===============================================================================
 # UTILS
@@ -366,11 +367,11 @@ confirm() {
     fi
 
     clear
-    [[ -z $output ]] && echo "None selected" || echo -e "$output"
+    [[ -z $output ]] && checkbox_output="None selected" || checkbox_output="$output"
 }
 
 quit() {
-    clear && echo "Exit"
+    clear && checkbox_output="Exit"
 }
 
 copy() {
@@ -477,8 +478,8 @@ main() {
             _end|G) end;;
             _pgup|u) page_up;;
             _pgdown|d) page_down;;
-            _esc|q) quit && return;;
-            _enter|o) confirm && return;;
+            _esc|q) quit && break;;
+            _enter|o) confirm && break;;
             _space|x) select_option;;
             _insert|v) toggle_select_mode;;
             _backspace|V) toggle_unselect_mode;;
@@ -491,6 +492,9 @@ main() {
 
         render
     done
+
+    echo "$checkbox_output"
+    return
 }
 
 main "$@"

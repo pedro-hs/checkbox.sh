@@ -92,7 +92,7 @@ Use the argument `--message=""`
 You can customize message
 
 - Using ANSI <br />
-  Example: `--message="\e[2K\e[31mhello world"`
+  Example: `--message="\033[2K\e[31mhello world"`
   <br /><br />
 - Using ASCII `\a \b \e \f \n \r \t \v` <br />
   Example: `--message="hello\rworld"`
@@ -194,19 +194,15 @@ Press `'h'` or call script with invalid argument, and a help page will appear
 
 ### How to use with another script
 
-- Call the script
-- Send the output to a file
-- Assign the file content to a variable
-- Delete the file
-
-<br />
+You can get the script response in the variable $checkbox_output after execute the script
 
 - Example:
 
 ```
-source checkbox.sh --multiple | tee log.txt
-selected_option=$(< log.txt)
-rm log.txt
+#!/usr/bin/env bash
+source checkbox.sh --multiple --index
+selected_options="$checkbox_output"
+echo "$selected_options"
 ```
 
 <br />
