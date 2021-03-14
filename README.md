@@ -13,9 +13,9 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 - [ Features ](#features)
 - [ Quick Start ](#quick-start)
 - [ Arguments Usage ](#arguments-usage)
+- [ How to use with another script ](#how-to-use-with-another-script)
 - [ Keybinds Usage ](#keybinds-usage)
 - [ Limitations ](#limitations)
-- [ How to use with another script ](#how-to-use-with-another-script)
 
 <br />
 <br />
@@ -61,7 +61,7 @@ You can add new options:
 
 <br />
 
-To start with options selected, put `+` in first character of the option
+To start with options selected, put `+` before the option text (in first character)
 
 - If the argument --multiple is missing, just the first option marked with + will start selected
 
@@ -92,7 +92,7 @@ Use the argument `--message=""`
 You can customize message
 
 - Using ANSI <br />
-  Example: `--message="\033[2K\e[31mhello world"`
+  Example: `--message="\033[2K\033[31mhello world"`
   <br /><br />
 - Using ASCII `\a \b \e \f \n \r \t \v` <br />
   Example: `--message="hello\rworld"`
@@ -119,6 +119,25 @@ Use the argument `--index`
 
 ![](example/index.gif)
 
+<br />
+<br />
+
+### How to use with another script
+
+You can get the script response in the variable $checkbox_output after execute the script
+
+- Example:
+
+```
+#!/usr/bin/env bash
+source checkbox.sh --multiple --index
+selected_options="$checkbox_output"
+echo "$selected_options"
+```
+
+- Other example: https://github.com/pedro-hs/git-selection
+
+<br />
 <br />
 
 ### Keybinds Usage
@@ -188,22 +207,6 @@ Press `'r'` to refresh renderization
 Press `'h'` or call script with invalid argument, and a help page will appear
 
 ![](example/help.gif)
-
-<br />
-<br />
-
-### How to use with another script
-
-You can get the script response in the variable $checkbox_output after execute the script
-
-- Example:
-
-```
-#!/usr/bin/env bash
-source checkbox.sh --multiple --index
-selected_options="$checkbox_output"
-echo "$selected_options"
-```
 
 <br />
 <br />

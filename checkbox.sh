@@ -98,7 +98,7 @@ help_page_opt() {
     while true; do
         local key=$( get_pressed_key )
         case $key in
-            _esc|q) exit && return;;
+            _esc|q) return;;
         esac
     done
 }
@@ -353,25 +353,18 @@ select_option() {
 }
 
 confirm() {
-    local output
-
     if $will_return_index; then
-        output="${selected_options[@]}"
+        checkbox_output="${selected_options[@]}"
 
     else
         for index in ${!options[@]}; do
             if [[ ${selected_options[*]} == *$index* ]]; then
-                output+="${options[index]}\n"
+                checkbox_output+=("${options[index]}")
             fi
         done
     fi
 
     clear
-    [[ -z $output ]] && checkbox_output="None selected" || checkbox_output="$output"
-}
-
-quit() {
-    clear && checkbox_output="Exit"
 }
 
 copy() {
@@ -478,7 +471,7 @@ main() {
             _end|G) end;;
             _pgup|u) page_up;;
             _pgdown|d) page_down;;
-            _esc|q) quit && break;;
+            _esc|q) clear && break;;
             _enter|o) confirm && break;;
             _space|x) select_option;;
             _insert|v) toggle_select_mode;;
@@ -493,7 +486,9 @@ main() {
         render
     done
 
-    echo "$checkbox_output"
+    for option in "${checkbox_output[@]}"; do
+        echo "$option"
+    done
     return
 }
 
