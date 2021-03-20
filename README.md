@@ -131,6 +131,7 @@ You can get the script response in the variable $checkbox_output after execute t
 ```
 #!/usr/bin/env bash
 source checkbox.sh --multiple --index
+clear
 selected_options="$checkbox_output"
 echo "$selected_options"
 ```
