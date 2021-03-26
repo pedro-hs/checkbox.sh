@@ -173,6 +173,12 @@ Press `[ENTER]` or `'o'`
 
 <br />
 
+##### Copy current option
+
+Press `'c'` or `'y'`
+
+<br />
+
 ##### Select or Unselect All (only with --multiple)
 
 Press `'a'` to select all and `'A'` to unselect all
