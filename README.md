@@ -214,7 +214,9 @@ Press `'h'` or call script with invalid argument, and a help page will appear
 
 ### Limitations
 
-- The script uses the command 'clear'
-- The script uses bash array
+- Uses the command `clear`
+- Uses the command `echo` (in the future I will replace from echo to printf for a better usage experience)
+- Doesn't work well in some bash versions in mac (I will fix this as soon as possible)
+- Uses bash array, so bash or similars are needed to run this script
 - Terminal must have +8 lines for the script works (except for customizations in --message)
-- The script don't have any test until now
+- Doesn't have any test until now
