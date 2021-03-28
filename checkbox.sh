@@ -95,7 +95,7 @@ help_page_opt() {
     output+="\n(press q to quit)"
 
     reset_screen
-    printf "\e[2J\e[?25l%b\n" "$output"
+    printf "\033[2J\033[?25l%b\n" "$output"
 
     while true; do
         local key=$( get_pressed_key )
@@ -124,7 +124,7 @@ help_page_keys() {
     output+="\n(press q to quit)"
 
     reset_screen
-    printf "\e[2J\e[?25l%b\n" "$output"
+    printf "\033[2J\033[?25l%b\n" "$output"
 
     while true; do
         local key=$( get_pressed_key )
@@ -410,11 +410,11 @@ refresh() {
 #===============================================================================
 render() {
     printf "\033[1;%dH"
-    printf "\e[2J\e[?25l%b\n" "$(get_output)"
+    printf "\033[2J\033[?25l%b\n" "$(get_output)"
 }
 
 reset_screen() {
-    printf "\e[2J\e[?25h\033[1;%dH"
+    printf "\033[2J\033[?25h\033[1;%dH"
 }
 
 get_pressed_key() {
