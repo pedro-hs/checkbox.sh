@@ -1,0 +1,4 @@
+\e[2J - clear terminal
+\e[?25h - show cursor
+\e[?25l - hide cursor
+\033[1;%dH - set cursor position to 0

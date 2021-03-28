@@ -54,6 +54,7 @@ will_return_index=false
 unselect_mode_on=false
 select_mode_on=false
 copy_in_message=false
+invalid_parameter=false
 
 options=("${DEFAULT_OPTIONS[@]}")
 selected_options=()
@@ -63,13 +64,13 @@ message=""
 separator=""
 options_input=""
 color=$WHITE
-checkbox_output=""
+checkbox_output=()
 
 #===============================================================================
 # UTILS
 #===============================================================================
 array_without_value() {
-    local value=$1
+    local value="$1"
     shift
     local new_array=()
 
@@ -83,7 +84,6 @@ array_without_value() {
 }
 
 help_page_opt() {
-    clear
     local output="(press q to quit)\n"
     output+="# Avaiable options:
 
@@ -93,7 +93,9 @@ help_page_opt() {
     --options:\n\tMenu options\n\tExample:\n\t\t$ ./checkbox.sh --options=\"checkbox 1\n\t\tcheckbox 2\n\t\tcheckbox 3\n\t\tcheckbox 4\n\t\tcheckbox 5\""
 
     output+="\n(press q to quit)"
-    echo -e "$output"
+
+    reset_screen
+    printf "\e[2J\e[?25l%b\n" "$output"
 
     while true; do
         local key=$( get_pressed_key )
@@ -104,7 +106,6 @@ help_page_opt() {
 }
 
 help_page_keys() {
-    clear
     local output="(press q to quit)\n"
     output+="# Keybinds
 
@@ -121,7 +122,9 @@ help_page_keys() {
     fi
 
     output+="\n(press q to quit)"
-    echo -e "$output"
+
+    reset_screen
+    printf "\e[2J\e[?25l%b\n" "$output"
 
     while true; do
         local key=$( get_pressed_key )
@@ -219,8 +222,8 @@ set_options() {
 
 validate_terminal_size() {
     if [[ $terminal_width -lt 8 ]]; then
-        clear
-        echo "Resize the terminal to least 8 lines and press r to refresh. The current terminal has $terminal_width lines"
+        reset_screen
+        printf "Resize the terminal to least 8 lines and press r to refresh. The current terminal has $terminal_width lines"
     fi
 }
 
@@ -237,6 +240,20 @@ get_footer() {
     fi
 
     echo "$footer"
+}
+
+get_output() {
+    terminal_width=$( tput lines )
+    handle_options
+    local footer="$( get_footer )"
+
+    local output="  $message\n"
+    output+="$WHITE$separator\n"
+    output+="$content"
+    output+="$WHITE$separator\n"
+    output+="  $footer\n"
+
+    echo "$output"
 }
 
 #===============================================================================
@@ -374,8 +391,6 @@ confirm() {
             fi
         done
     fi
-
-    clear
 }
 
 copy() {
@@ -393,18 +408,13 @@ refresh() {
 #===============================================================================
 # CORE FUNCTIONS
 #===============================================================================
-get_output() {
-    terminal_width=$( tput lines )
-    handle_options
-    local footer="$( get_footer )"
+render() {
+    printf "\033[1;%dH"
+    printf "\e[2J\e[?25l%b\n" "$(get_output)"
+}
 
-    local output="  $message\n"
-    output+="$WHITE$separator\n"
-    output+="$content"
-    output+="$WHITE$separator\n"
-    output+="  $footer\n"
-
-    echo "$output"
+reset_screen() {
+    printf "\e[2J\e[?25h\033[1;%dH"
 }
 
 get_pressed_key() {
@@ -442,7 +452,7 @@ get_opt() {
             --multiple) has_multiple_options=true;;
             --message=*) message="${opt#*=}";;
             --options=*) options_input="$opt";;
-            *) help_page_opt;;
+            *) help_page_opt && invalid_parameter=true;;
         esac
     done
 }
@@ -467,8 +477,14 @@ constructor() {
 #===============================================================================
 main() {
     get_opt "$@"
+
+    if $invalid_parameter; then
+        reset_screen
+        return
+    fi
+
     constructor
-    printf "%b\n" "$(clear; get_output)"
+    render
 
     while true; do
         validate_terminal_size
@@ -481,7 +497,7 @@ main() {
             _end|G) end;;
             _pgup|u) page_up;;
             _pgdown|d) page_down;;
-            _esc|q) clear && break;;
+            _esc|q) break;;
             _enter|o) confirm && break;;
             _space|x) select_option;;
             _insert|v) toggle_select_mode;;
@@ -493,12 +509,15 @@ main() {
             h) help_page_keys;;
         esac
 
-        printf "%b\n" "$(clear; get_output)"
+        render
     done
 
+    reset_screen
+
     for option in "${checkbox_output[@]}"; do
-        echo "$option"
+        printf "$option\n"
     done
+
     return
 }
 

@@ -8,3 +8,7 @@
 - Can: start selected; navigate; copy
 - Can't: select; unselect
 - example: --options="on option 1|+-off option 2 start selected|-off option 3"
+
+#### Message is missing
+
+#### Create a window to run checkbox, when quit the program, the execute commands before checkbox should be there
