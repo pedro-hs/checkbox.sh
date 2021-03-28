@@ -148,10 +148,21 @@ handle_options() {
     done
 }
 
-handle_option() {
-    local index=$1 option=$2
+value_in_array() {
+    local element="$1" && shift
+    local elements="$@"
 
-    if [[ ${selected_options[*]} == *$index*  ]]; then
+    for elements; do
+        [[ $elements == $element ]] && return 0
+    done
+
+    return 1
+}
+
+handle_option() {
+    local index="$1" option="$2"
+
+    if value_in_array "$index" "${selected_options[@]}"; then
         content+="$color    $SELECTED $option\n"
 
     else
@@ -172,11 +183,11 @@ set_line_color() {
 }
 
 select_many_options() {
-    if [[ ! ${selected_options[*]} == *$cursor* ]] \
+    if ! value_in_array "$cursor" "${selected_options[@]}" \
         && $has_multiple_options && $select_mode_on; then
             selected_options+=("$cursor")
 
-        elif [[ ${selected_options[*]} == *$cursor* ]] \
+        elif value_in_array "$cursor" "${selected_options[@]}" \
             && $has_multiple_options && $unselect_mode_on; then
                     selected_options=($( array_without_value "$cursor" "${selected_options[@]}" ))
     fi
@@ -342,7 +353,7 @@ end() {
 }
 
 select_option() {
-    if [[ ! ${selected_options[*]} == *$cursor* ]]; then
+    if ! value_in_array "$cursor" "${selected_options[@]}"; then
         $has_multiple_options \
             && selected_options+=("$cursor") \
             || selected_options=("$cursor")
@@ -358,7 +369,7 @@ confirm() {
 
     else
         for index in ${!options[@]}; do
-            if [[ ${selected_options[*]} == *$index* ]]; then
+            if value_in_array "$index" "${selected_options[@]}"; then
                 checkbox_output+=("${options[index]}")
             fi
         done
@@ -382,11 +393,10 @@ refresh() {
 #===============================================================================
 # CORE FUNCTIONS
 #===============================================================================
-render() {
+get_output() {
     terminal_width=$( tput lines )
     handle_options
     local footer="$( get_footer )"
-    clear
 
     local output="  $message\n"
     output+="$WHITE$separator\n"
@@ -394,7 +404,7 @@ render() {
     output+="$WHITE$separator\n"
     output+="  $footer\n"
 
-    echo -en "$output"
+    echo "$output"
 }
 
 get_pressed_key() {
@@ -458,7 +468,7 @@ constructor() {
 main() {
     get_opt "$@"
     constructor
-    render
+    printf "%b\n" "$(clear; get_output)"
 
     while true; do
         validate_terminal_size
@@ -483,7 +493,7 @@ main() {
             h) help_page_keys;;
         esac
 
-        render
+        printf "%b\n" "$(clear; get_output)"
     done
 
     for option in "${checkbox_output[@]}"; do

@@ -2,13 +2,6 @@
 
 - update readme
 
-#### fux bug:
-
-- run with --multiple
-- select all options
-- Press V and move down with j or [down arrow]
-- The first 10 options are not unselect
-
 #### disabled options
 
 - Use the symbol (-) in start(first or second character) of option to start disabled
