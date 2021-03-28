@@ -85,13 +85,7 @@ array_without_value() {
 
 help_page_opt() {
     local output="(press q to quit)\n"
-    output+="# Avaiable options:
-
-    --multiple:\n\tSelected multiple options\n\tExample:\n\t\t$ ./checkbox.sh --multiple
-    --index:\n\tReturn index instead of value\n\tExample:\n\t\t$ ./checkbox.sh --index
-    --message:\n\tCustom message\n\tExample:\n\t\t$ ./checkbox.sh --message=\"this message will be shown in the header\"
-    --options:\n\tMenu options\n\tExample:\n\t\t$ ./checkbox.sh --options=\"checkbox 1\n\t\tcheckbox 2\n\t\tcheckbox 3\n\t\tcheckbox 4\n\t\tcheckbox 5\""
-
+    output+="# Avaiable options:\n\n\t--multiple:\n\t\tSelected multiple options\n\t\tExample:\n\t\t\t$ ./checkbox.sh --multiple\n\t--index:\n\t\tReturn index instead of value\n\t\tExample:\n\t\t\t$ ./checkbox.sh --index\n\t--message:\n\t\tCustom message\n\t\tExample:\n\t\t\t$ ./checkbox.sh --message=\"this message will be shown in the header\"\n\t--options:\n\t\tMenu options\n\t\tExample:\n\t\t\t$ ./checkbox.sh --options=\"checkbox 1\n\t\t\tcheckbox 2\n\t\t\tcheckbox 3\n\t\t\tcheckbox 4\n\t\t\tcheckbox 5\""
     output+="\n(press q to quit)"
 
     reset_screen
@@ -107,18 +101,10 @@ help_page_opt() {
 
 help_page_keys() {
     local output="(press q to quit)\n"
-    output+="# Keybinds
-
-    \t[ENTER]         or o: Close and return selected options\n\t[SPACE]         or x: Select current option
-    \t[ESC]           or q: Exit\n\t[UP ARROW]      or k: Move cursor to option above\n\t[DOWN ARROW]    or j: Move cursor to option below
-    \t[HOME]          or g: Move cursor to first option\n\t[END]           or G: Move cursor to last option
-    \t[PAGE UP]       or u: Move cursor 5 options above\n\t[PAGE DOWN]     or d: Move cursor 5 options below
-    \tc               or y: Copy current option\n\tr                   : Refresh renderization\n\th                   : Help page"
+    output+="# Keybinds\n\n\t[ENTER]         or o: Close and return selected options\n\t[SPACE]         or x: Select current option\n\t[ESC]           or q: Exit\n\t[UP ARROW]      or k: Move cursor to option above\n\t[DOWN ARROW]    or j: Move cursor to option below\n\t[HOME]          or g: Move cursor to first option\n\t[END]           or G: Move cursor to last option\n\t[PAGE UP]       or u: Move cursor 5 options above\n\t[PAGE DOWN]     or d: Move cursor 5 options below\n\tc               or y: Copy current option\n\tr                   : Refresh renderization\n\th                   : Help page"
 
     if $has_multiple_options; then
-        output+="\n\tA                   : Unselect all options\n\ta                   : Select all options
-        [INSERT]        or v: On/Off select options during navigation (select mode)
-        [BACKSPACE]     or V: On/Off unselect options during navigation (unselect mode)"
+        output+="\n\tA                   : Unselect all options\n\ta                   : Select all options\n\t[INSERT]        or v: On/Off select options during navigation (select mode)\n\t[BACKSPACE]     or V: On/Off unselect options during navigation (unselect mode)"
     fi
 
     output+="\n(press q to quit)"
