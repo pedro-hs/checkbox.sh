@@ -222,5 +222,5 @@ Press `'h'` or call script with invalid argument, and a help page will appear
 
 - Doesn't work well in some bash versions in mac (I will fix this as soon as possible)
 - Uses bash array, so bash or similars are needed to run this script
-- Terminal must have +8 lines for the script works (except for customizations in --message)
-- Doesn't have any test until now
+- Terminal must have at least 8 lines for the script works. Maybe breaks in some cases with --message too. Resize terminal and press 'r'
+- Don't have unit test

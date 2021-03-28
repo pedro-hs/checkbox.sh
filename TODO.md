@@ -11,4 +11,4 @@
 
 #### Message is missing
 
-#### Create a window to run checkbox, when quit the program, the execute commands before checkbox should be there
+#### Create a window to run checkbox, when quit the program, the output of executed commands before checkbox should be there

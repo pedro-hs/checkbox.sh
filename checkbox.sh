@@ -513,6 +513,7 @@ main() {
     done
 
     reset_screen
+    printf "Selected:\n"
 
     for option in "${checkbox_output[@]}"; do
         printf "$option\n"
