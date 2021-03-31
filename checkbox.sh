@@ -70,8 +70,7 @@ checkbox_output=()
 # UTILS
 #===============================================================================
 array_without_value() {
-    local value="$1"
-    shift
+    local value="$1" && shift
     local new_array=()
 
     for array in ${@}; do
@@ -81,6 +80,17 @@ array_without_value() {
     done
 
     echo "${new_array[@]}"
+}
+
+value_in_array() {
+    local element="$1" && shift
+    local elements="$@"
+
+    for elements; do
+        [[ $elements == $element ]] && return 0
+    done
+
+    return 1
 }
 
 help_page_opt() {
@@ -135,17 +145,6 @@ handle_options() {
             color=$WHITE
         fi
     done
-}
-
-value_in_array() {
-    local element="$1" && shift
-    local elements="$@"
-
-    for elements; do
-        [[ $elements == $element ]] && return 0
-    done
-
-    return 1
 }
 
 handle_option() {
@@ -499,11 +498,15 @@ main() {
     done
 
     reset_screen
-    [[ ${#checkbox_output[@]} -gt 0 ]] && printf "Selected:\n"
 
-    for option in "${checkbox_output[@]}"; do
-        printf "$option\n"
-    done
+    if [[ ${#checkbox_output[@]} -gt 0 ]]; then
+        printf "Selected:\n"
+        for option in "${checkbox_output[@]}"; do
+            printf "$option\n"
+        done
+    else
+        printf "None selected\n"
+    fi
 
     return
 }
