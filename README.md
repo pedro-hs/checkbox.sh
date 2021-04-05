@@ -12,6 +12,7 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 
 - [ Features ](#features)
 - [ Quick Start ](#quick-start)
+- [ Promotion ](#promotion)
 - [ Arguments Usage ](#arguments-usage)
 - [ How to use with another script ](#how-to-use-with-another-script)
 - [ Keybinds Usage ](#keybinds-usage)
@@ -41,9 +42,13 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 
 Run the script (in bash shell) with `source checkbox.sh`
 
-#### ⭐ If like this software, give a star ⭐
+<br />
 
-#### 📖 Contributions are welcome 📖
+### Promotion
+
+<strong>⭐ If like this software, give a star ⭐</strong>
+
+<strong>📖 Contributions are welcome 📖</strong>
 
 <br />
 
