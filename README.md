@@ -41,9 +41,9 @@ Interactive checkboxes (menu) with pagination and vim keybinds for bash
 
 Run the script (in bash shell) with `source checkbox.sh`
 
-<br />
-
 #### ⭐ If like this software, give a star ⭐
+
+#### 📖 Contributions are welcome 📖
 
 <br />
 
@@ -224,7 +224,7 @@ Press `'h'` or call script with invalid argument, and a help page will appear
 
 ### Limitations
 
-- Doesn't work well in some bash versions in mac (I will fix this as soon as possible)
+- Doesn't have a good compatibility with mac, I will work on this in future
 - Uses bash array, so bash or similars are needed to run this script
 - Terminal must have at least 8 lines for the script works. Maybe breaks in some cases with --message too. Resize terminal and press 'r'
 - Don't have unit test
