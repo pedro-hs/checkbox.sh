@@ -43,6 +43,10 @@ Run the script (in bash shell) with `source checkbox.sh`
 
 <br />
 
+#### ⭐ Do you like this software? Please, give a star ⭐
+
+<br />
+
 ### Arguments Usage
 
 ##### Checkbox options
