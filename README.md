@@ -46,7 +46,7 @@ Run the script (in bash shell) with `source checkbox.sh`
 
 ### Promotion
 
-<strong>⭐ If like this software, give a star ⭐</strong>
+<strong>⭐ If you like this software, give a star ⭐</strong>
 
 <strong>📖 Contributions are welcome 📖</strong>
 
