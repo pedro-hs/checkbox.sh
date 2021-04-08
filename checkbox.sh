@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 contants() {
-    readonly SELECTED="[x]"
+    readonly SELECTED="[■]"
     readonly UNSELECTED="[ ]"
 
     readonly WHITE="\033[2K\033[37m"
-    readonly BLUE="\033[2K\033[34m"
+    readonly BLUE="\033[2K\033[94m"
     readonly RED="\033[2K\033[31m"
     readonly GREEN="\033[2K\033[32m"
 
@@ -35,7 +35,7 @@ variables() {
     message=""
     separator=""
     options_input=""
-    color=$WHITE
+    color="${WHITE}"
     checkbox_output=()
 
 }
@@ -154,8 +154,8 @@ auxiliary_functions() {
 
         elif value_in_array "$cursor" "${selected_options[@]}" &&
             $has_multiple_options && $unselect_mode_on; then
-            # selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
-            mapfile -t selected_options < <(array_without_value "$cursor" "${selected_options[@]}")
+            selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
+            # mapfile -t selected_options < <(array_without_value "$cursor" "${selected_options[@]}")
         fi
     }
 
@@ -259,8 +259,8 @@ key_press_functions() {
 
             else
                 unselect_mode_on=true
-                # selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
-                mapfile -t selected_options < <(array_without_value "$cursor" "${selected_options[@]}")
+                selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
+                # mapfile -t selected_options < <(array_without_value "${cursor}" "${selected_options[@]}")
 
             fi
         fi
@@ -355,8 +355,8 @@ key_press_functions() {
                 selected_options=("${cursor}")
 
         else
-            # selected_options=($(array_without_value "${cursor}" "${selected_options[@]}"))
-            mapfile -t selected_options < <(array_without_value "$cursor" "${selected_options[@]}")
+            selected_options=($(array_without_value "${cursor}" "${selected_options[@]}"))
+            # mapfile -t selected_options < <(array_without_value "$cursor" "${selected_options[@]}")
 
         fi
     }
