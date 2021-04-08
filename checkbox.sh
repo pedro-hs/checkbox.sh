@@ -536,7 +536,7 @@ main() {
 }
 
 init() {
-    contants
+    constants
     variables
     utils
     auxiliary_functions
