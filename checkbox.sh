@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-contants() {
+constants() {
     readonly SELECTED="[■]"
     readonly UNSELECTED="[ ]"
 
     readonly WHITE="\033[2K\033[37m"
-    readonly BLUE="\033[2K\033[94m"
+    readonly BLUE="\033[2K\033[34m"
     readonly RED="\033[2K\033[31m"
     readonly GREEN="\033[2K\033[32m"
 
@@ -160,16 +160,13 @@ auxiliary_functions() {
     }
 
     set_options() {
-        if ! [[ $options_input == "" ]]; then
+        if ! [[ "${options_input}" == "" ]]; then
             options=()
 
             local temp_options=""
             temp_options=$(echo "${options_input#*=}" | sed "s/\\a//g;s/\\b//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g")
-            # temp_options=$(echo "${temp_options}" | sed "s/|\+/|/g")
-            temp_options="temp_options"
             # shellcheck disable=SC2001
-            echo "${temp_options}" | sed "s/|\+/|/g"
-
+            temp_options=$(echo "$temp_options" | sed "s/|\+/|/g")
             temp_options=$(echo "$temp_options" | tr "\n" "|")
             IFS="|" read -ra temp_options <<<"$temp_options"
 
@@ -177,13 +174,13 @@ auxiliary_functions() {
                 local option=${temp_options[index]}
 
                 if [[ ${option::1} == "+" ]]; then
-                    if $has_multiple_options || [[ -z "${selected_options[0]}" ]]; then
-                        selected_options+=("$index")
+                    if "${has_multiple_options}" || [[ -z "${selected_options[0]}" ]]; then
+                        selected_options+=("${index}")
                     fi
-                    option=${option:1}
+                    option="${option:1}"
                 fi
 
-                options+=("$option")
+                options+=("${option}")
             done
         fi
     }
@@ -259,6 +256,7 @@ key_press_functions() {
 
             else
                 unselect_mode_on=true
+                # shellcheck disable=SC2207
                 selected_options=($(array_without_value "$cursor" "${selected_options[@]}"))
                 # mapfile -t selected_options < <(array_without_value "${cursor}" "${selected_options[@]}")
 
@@ -355,6 +353,7 @@ key_press_functions() {
                 selected_options=("${cursor}")
 
         else
+            # shellcheck disable=SC2207
             selected_options=($(array_without_value "${cursor}" "${selected_options[@]}"))
             # mapfile -t selected_options < <(array_without_value "$cursor" "${selected_options[@]}")
 
@@ -546,7 +545,7 @@ init() {
 
     reset_screen
 
-    main "${@}" --multiple
+    main "${@}"
 }
 
 init "${@}"
