@@ -185,7 +185,7 @@ set_options() {
     if ! [[ $options_input == "" ]]; then
         options=()
 
-        local temp_options=$( echo "${options_input#*=}" | sed "s/\\a//g;s/\\b//g;s/\\e//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g;s/\\v//g" )
+        local temp_options=$( echo "${options_input#*=}" | sed "s/\\a//g;s/\\b//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g" )
         temp_options=$( echo "$temp_options" | sed "s/|\+/|/g" )
         temp_options=$( echo "$temp_options" | tr "\n" "|" )
         IFS="|" read -a temp_options <<< "$temp_options"

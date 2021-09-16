@@ -78,7 +78,7 @@ To start with options selected, put `+` before the option text (in first charact
 
 <br />
 
-Any of this ASCII signs `\a \b \e \f \n \r \t \v` in any part of options will be removed.
+Any of this ASCII signs `\a \b \f \n \r \t` in any part of options will be removed.
 
 ![](example/options/options_ascii.gif)
 
