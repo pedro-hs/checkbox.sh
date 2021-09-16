@@ -12,3 +12,5 @@
 #### bug: Message is missing after change all outputs to printf
 
 #### improve: Create a window to run checkbox, when quit the program, the output of executed commands before checkbox should be there
+
+#### bug: Fix usage on macos
