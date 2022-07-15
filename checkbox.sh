@@ -253,7 +253,9 @@ toggle_select_mode() {
 
         else
             select_mode_on=true
-            selected_options+=("$cursor")
+            if ! value_in_array "$cursor" "${selected_options[@]}"; then
+                selected_options+=("$cursor")
+            fi
         fi
     fi
 }
