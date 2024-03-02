@@ -1,30 +1,11 @@
 #!/usr/bin/env bash
 #===============================================================================
-#NAME
-#  checkbox.sh
-#
-#DESCRIPTION
-#  Creates interactive checkboxes (menu) for the terminal
-#  For more info look the README.md on <https://github.com/pedro-hs/checkbox.sh>
-#  Features:
-#    - Select only a option or multiple options
-#    - Select or unselect multiple options easily
-#    - Select all or unselect all
-#    - Pagination
-#    - Optional Vim keybinds
-#    - Start with options selected
-#    - Show selected options counter for multiple options
-#    - Show custom message
-#    - Show current option index and options amount
-#    - Copy current option value to clipboard
-#    - Help tab when press h or wrongly call the script
-#
 #SOURCE
 #  <https://github.com/pedro-hs/checkbox.sh>
 #
-#INSPIRED BY
-#  <https://gist.github.com/blurayne/f63c5a8521c0eeab8e9afd8baa45c65e>
-#  <https://www.bughunter2k.de/blog/cursor-controlled-selectmenu-in-bash>
+#DESCRIPTION
+#  Create customizable checkbox for the terminal
+#  Check out how to use on README.md at <https://github.com/pedro-hs/checkbox.sh>
 #
 #===============================================================================
 # CONTANTS
@@ -32,13 +13,14 @@
 readonly SELECTED="[x]"
 readonly UNSELECTED="[ ]"
 
-readonly WHITE="\033[2K\033[37m"
-readonly BLUE="\033[2K\033[34m"
-readonly RED="\033[2K\033[31m"
-readonly GREEN="\033[2K\033[32m"
+readonly ANSI_ESCAPE="\033"
+readonly WHITE="${ANSI_ESCAPE}[37m"
+readonly BLUE="${ANSI_ESCAPE}[34m"
+readonly RED="${ANSI_ESCAPE}[36m"
+readonly GREEN="${ANSI_ESCAPE}[32m"
 
-readonly INTERFACE_SIZE=6
-readonly DEFAULT_OPTIONS=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9" "Option 10" "Option 11" "Option 12" "Option 13" "Option 14" "Option 15" "Option 16" "Option 17" "Option 18" "Option 19" "Option 20" "Option 21" "Option 22" "Option 23" "Option 24" "Option 25" "Option 26" "Option 27" "Option 28" "Option 29" "Option 30")
+INTERFACE_SIZE=6
+SAMPLE_OPTIONS=("Option 1" "Option 2" "Option 3" "Option 4" "Option 5" "Option 6" "Option 7" "Option 8" "Option 9" "Option 10" "Option 11" "Option 12" "Option 13" "Option 14" "Option 15" "Option 16" "Option 17" "Option 18" "Option 19" "Option 20" "Option 21" "Option 22" "Option 23" "Option 24" "Option 25" "Option 26" "Option 27" "Option 28" "Option 29" "Option 30")
 
 #===============================================================================
 # VARIABLES
@@ -50,13 +32,13 @@ start_page=0
 end_page=0
 
 has_multiple_options=false
-will_return_index=false
+has_index_result=false
 unselect_mode_on=false
 select_mode_on=false
-copy_in_message=false
-invalid_parameter=false
+show_copy_message=false
+show_help=false
 
-options=("${DEFAULT_OPTIONS[@]}")
+options=("${SAMPLE_OPTIONS[@]}")
 selected_options=()
 
 content=""
@@ -67,7 +49,7 @@ color=$WHITE
 checkbox_output=()
 
 #===============================================================================
-# UTILS
+# HANDLE ARRAY
 #===============================================================================
 array_without_value() {
     local value="$1" && shift
@@ -93,35 +75,19 @@ value_in_array() {
     return 1
 }
 
-help_page_opt() {
-    local output="(press q to quit)\n"
-    output+="# Avaiable options:\n\n\t--multiple:\n\t\tSelected multiple options\n\t\tExample:\n\t\t\t$ ./checkbox.sh --multiple\n\t--index:\n\t\tReturn index instead of value\n\t\tExample:\n\t\t\t$ ./checkbox.sh --index\n\t--message:\n\t\tCustom message\n\t\tExample:\n\t\t\t$ ./checkbox.sh --message=\"this message will be shown in the header\"\n\t--options:\n\t\tMenu options\n\t\tExample:\n\t\t\t$ ./checkbox.sh --options=\"checkbox 1\n\t\t\tcheckbox 2\n\t\t\tcheckbox 3\n\t\t\tcheckbox 4\n\t\t\tcheckbox 5\""
-    output+="\n(press q to quit)"
+#===============================================================================
+# HELP PAGE
+#===============================================================================
+help_page() {
+    local output="# Arguments:\n\t--multiple: Select multiple => ./checkbox.sh --multiple\n\t--index: Get selected index => ./checkbox.sh --index\n\t--message: A custom message => ./checkbox.sh --message=\"lorem ipsum\"\n\t--options: The options list => ./checkbox.sh --options=\"item 1|item 2\"\n"
+    output+="\n# Keybinds:\n\t[UP/DOWN ARROWS], [HOME/END], [PAGE UP/DOWN] or k/j, g/G, u/d: Move cursor\n\to or [ENTER]: Close and return selected options\n\tx or [SPACE]: Select current option\n\tq or [ESC]: Exit\n\ty or c: Copy current option\n\tr: Refresh renderization\n\tA: Unselect all options (need --multiple)\n\ta: Select all options (need --multiple)\n\tv or [INSERT]: Select options while moving cursor (need --multiple)\n\tV or [BACKSPACE]: Unselect options while moving cursor (need --multiple)\n(press q to quit)"
 
-    reset_screen
-    printf "\033[2J\033[?25l%b\n" "$output"
+    printf "$output"
 
-    while true; do
-        local key=$( get_pressed_key )
-        case $key in
-            _esc|q) return;;
-        esac
-    done
+    quit_help_page
 }
 
-help_page_keys() {
-    local output="(press q to quit)\n"
-    output+="# Keybinds\n\n\t[ENTER]         or o: Close and return selected options\n\t[SPACE]         or x: Select current option\n\t[ESC]           or q: Exit\n\t[UP ARROW]      or k: Move cursor to option above\n\t[DOWN ARROW]    or j: Move cursor to option below\n\t[HOME]          or g: Move cursor to first option\n\t[END]           or G: Move cursor to last option\n\t[PAGE UP]       or u: Move cursor 5 options above\n\t[PAGE DOWN]     or d: Move cursor 5 options below\n\tc               or y: Copy current option\n\tr                   : Refresh renderization\n\th                   : Help page"
-
-    if $has_multiple_options; then
-        output+="\n\tA                   : Unselect all options\n\ta                   : Select all options\n\t[INSERT]        or v: On/Off select options during navigation (select mode)\n\t[BACKSPACE]     or V: On/Off unselect options during navigation (unselect mode)"
-    fi
-
-    output+="\n(press q to quit)"
-
-    reset_screen
-    printf "\033[2J\033[?25l%b\n" "$output"
-
+quit_help_page() {
     while true; do
         local key=$( get_pressed_key )
         case $key in
@@ -131,9 +97,9 @@ help_page_keys() {
 }
 
 #===============================================================================
-# AUXILIARY FUNCTIONS
+# CHECKBOX
 #===============================================================================
-handle_options() {
+render_options() {
     content=""
 
     for index in ${!options[@]}; do
@@ -141,13 +107,13 @@ handle_options() {
             local option=${options[$index]}
 
             [[ ${options[$cursor]} == $option ]] && set_line_color
-            handle_option "$index" "$option"
+            render_option "$index" "$option"
             color=$WHITE
         fi
     done
 }
 
-handle_option() {
+render_option() {
     local index="$1" option="$2"
 
     if value_in_array "$index" "${selected_options[@]}"; then
@@ -182,32 +148,38 @@ select_many_options() {
 }
 
 set_options() {
-    if ! [[ $options_input == "" ]]; then
-        options=()
-
-        local temp_options=$( echo "${options_input#*=}" | sed "s/\\a//g;s/\\b//g;s/\\f//g;s/\\n//g;s/\\r//g;s/\\t//g" )
-        temp_options=$( echo "$temp_options" | sed "s/|\+/|/g" )
-        temp_options=$( echo "$temp_options" | tr "\n" "|" )
-        IFS="|" read -a temp_options <<< "$temp_options"
-
-        for index in ${!temp_options[@]}; do
-            local option=${temp_options[index]}
-
-            if [[ ${option::1} == "+" ]]; then
-                if $has_multiple_options || [[ -z $selected_options ]]; then
-                    selected_options+=("$index")
-                fi
-                option=${option:1}
-            fi
-
-            options+=("$option")
-        done
+    if [[ $options_input == "" ]]; then
+        return
     fi
+
+    options=()
+
+    local escaped_options=$( escape_options_ascii_signs )
+    local lines=$( echo "$escaped_options" | tr "\n" "|" )
+    IFS="|" read -a lines <<< "$lines"
+
+    for index in ${!lines[@]}; do
+        local option=${lines[index]}
+
+        if [[ ${option::1} == "+" ]]; then
+            if $has_multiple_options || [[ -z $selected_options ]]; then
+                selected_options+=("$index")
+            fi
+            option=${option:1}
+        fi
+
+        options+=("$option")
+    done
+}
+
+escape_options_ascii_signs() {
+    local ascii_signs=("a" "b" "f" "n" "r" "t")
+    local ascii_signs_escape=$(printf "s/\\\\\%s//g;" "${ascii_signs[@]}")
+    echo $( echo "${options_input#*=}" | sed $ascii_signs_escape )
 }
 
 validate_terminal_size() {
     if [[ $terminal_width -lt 8 ]]; then
-        reset_screen
         printf "Resize the terminal to least 8 lines and press r to refresh. The current terminal has $terminal_width lines"
     fi
 }
@@ -219,28 +191,49 @@ get_footer() {
         footer+="  |  ${#selected_options[@]} selected"
     fi
 
-    if $copy_in_message; then
+    if $show_copy_message; then
         footer+="  |  current line copied"
-        copy_in_message=false
+        show_copy_message=false
     fi
 
     echo "$footer"
 }
 
-get_output() {
+render_checkbox() {
     terminal_width=$( tput lines )
-    handle_options
-    local footer="$( get_footer )"
 
-    local output="  $message\n"
-    output+="$WHITE$separator\n"
+    render_options
+
+    local output=""
+
+    if [[ $message != "" ]]; then
+        output+="  $message\n$WHITE$separator"
+    fi
+    output+="\n"
     output+="$content"
     output+="$WHITE$separator\n"
+
+    local footer="$( get_footer )"
     output+="  $footer\n"
 
-    echo "$output"
+    printf "$output"
 }
 
+clear_checkbox() {
+    local header_footer_lines=3;
+    local checkbox_lines=$((${#options[@]} + $header_footer_lines))
+    local delete_lines_above="${ANSI_ESCAPE}[${checkbox_lines}A"
+
+    printf "$delete_lines_above"
+}
+
+render_result() {
+    if [[ ${#checkbox_output[@]} -gt 0 ]]; then
+        for option in "${checkbox_output[@]}"; do
+            echo "$option"
+        done
+    fi
+}
 #===============================================================================
 # KEY PRESS FUNCTIONS
 #===============================================================================
@@ -368,7 +361,7 @@ select_option() {
 }
 
 confirm() {
-    if $will_return_index; then
+    if $has_index_result; then
         checkbox_output="${selected_options[@]}"
 
     else
@@ -383,7 +376,7 @@ confirm() {
 copy() {
     echo "${options[$cursor]}" | xclip -sel clip
     echo "${options[$cursor]}" | xclip
-    copy_in_message=true
+    show_copy_message=true
 }
 
 refresh() {
@@ -393,17 +386,8 @@ refresh() {
 }
 
 #===============================================================================
-# CORE FUNCTIONS
+# BASE FUNCTIONS
 #===============================================================================
-render() {
-    printf "\033[1;%dH"
-    printf "\033[2J\033[?25l%b\n" "$(get_output)"
-}
-
-reset_screen() {
-    printf "\033[2J\033[?25h\033[1;%dH"
-}
-
 get_pressed_key() {
     IFS= read -sn1 key 2>/dev/null >&2
 
@@ -429,17 +413,18 @@ get_pressed_key() {
     echo "$key"
 }
 
-get_opt() {
+get_arguments() {
     while [[ $# -gt 0 ]]; do
         opt=$1
         shift
 
         case $opt in
-            --index) will_return_index=true;;
+            --index) has_index_result=true;;
             --multiple) has_multiple_options=true;;
             --message=*) message="${opt#*=}";;
             --options=*) options_input="$opt";;
-            *) help_page_opt && invalid_parameter=true;;
+            --help) show_help=true;;
+            *) show_help=true;;
         esac
     done
 }
@@ -463,15 +448,16 @@ constructor() {
 # MAIN
 #===============================================================================
 main() {
-    get_opt "$@"
+    get_arguments "$@"
 
-    if $invalid_parameter; then
-        reset_screen
+    if $show_help; then
+        help_page
+        printf "\n"
         return
     fi
 
     constructor
-    render
+    render_checkbox
 
     while true; do
         validate_terminal_size
@@ -493,24 +479,13 @@ main() {
             r) refresh;;
             a) select_all;;
             A) unselect_all;;
-            h) help_page_keys;;
         esac
 
-        render
+        clear_checkbox
+        render_checkbox
     done
 
-    reset_screen
-
-    if [[ ${#checkbox_output[@]} -gt 0 ]]; then
-        printf "Selected:\n"
-        for option in "${checkbox_output[@]}"; do
-            printf "$option\n"
-        done
-    else
-        printf "None selected\n"
-    fi
-
-    return
+    render_result
 }
 
 main "$@"
